@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Almeria NeoBank</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*:before,*:after{box-sizing:border-box;margin:0;padding:0}
+:root{
+--cinza-900:#0a0a0f;--cinza-800:#13131a;--cinza-700:#1c1c26;--cinza-600:#252533;--cinza-500:#3a3a50;--cinza-400:#6b6b85;--cinza-300:#9898b0;--cinza-200:#e8e8f0;--cinza-100:#f7f7fb;
+--verde-500:#00e5a0;--verde-200:#b8f5e0;--lilas-500:#7c5cfc;--lilas-200:#d4caff;--rosa-500:#ff6b9d;--ambar-500:#ffb547;
+--texto-primario:#f0f0f8;--texto-secundario:#9898b0;--texto-terciario:#555570;
+--borda:#252533;
+}
+body{font-family:'Inter',sans-serif;background:var(--cinza-900);color:var(--texto-primario);min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:24px 16px}
+.aplicativo{width:100%;max-width:1400px;background:var(--cinza-800);border-radius:20px;border:1px solid var(--borda);overflow:hidden;display:flex;flex-direction:column}
+.cabecalho{display:grid;grid-template-columns:200px 1fr auto;align-items:center;padding:16px 32px;border-bottom:1px solid var(--borda);gap:24px}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icone{width:36px;height:36px;background:linear-gradient(135deg,var(--lilas-500),var(--verde-500));border-radius:10px;display:flex;align-items:center;justify-content:center}
+.logo-icone svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2}
+.logo-titulo{display:flex;flex-direction:column;line-height:1.2}
+.logo-titulo span:first-child{font-size:15px;font-weight:700;color:var(--texto-primario)}
+.logo-titulo span:last-child{font-size:11px;color:var(--texto-secundario);font-weight:400}
+.abas{display:flex;gap:4px}
+.abas a{padding:8px 16px;font-size:13px;color:var(--texto-secundario);text-decoration:none;border-radius:8px;transition:.2s;font-weight:500}
+.abas a:hover{color:var(--texto-primario);background:var(--cinza-700)}
+.abas a.ativo{color:var(--texto-primario);background:var(--cinza-600)}
+.acoes-cabecalho{display:flex;align-items:center;gap:12px}
+.perfil-usuario{display:flex;align-items:center;gap:10px;background:var(--cinza-700);padding:8px 14px;border-radius:40px;border:none;cursor:pointer;color:var(--texto-primario);font-size:13px;font-weight:500;transition:.2s}
+.perfil-usuario:hover{background:var(--cinza-600)}
+.avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--lilas-500),var(--rosa-500));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+.botao-icone{width:38px;height:38px;border-radius:10px;border:1px solid var(--borda);background:transparent;color:var(--texto-secundario);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+.botao-icone:hover{background:var(--cinza-700);color:var(--texto-primario)}
+.corpo{display:grid;grid-template-columns:180px 1fr 340px;min-height:600px}
+.navegacao-lateral{padding:24px 16px;border-right:1px solid var(--borda);display:flex;flex-direction:column;gap:4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--texto-secundario);text-decoration:none;font-size:13px;font-weight:500;transition:.2s;cursor:pointer}
+.nav-item:hover{background:var(--cinza-700);color:var(--texto-primario)}
+.nav-item.ativo{background:var(--cinza-700);color:var(--texto-primario)}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;opacity:.7}
+.nav-rodape{margin-top:auto;padding-top:16px;border-top:1px solid var(--borda)}
+.nav-rodape p{font-size:11px;color:var(--texto-terciario);line-height:1.5}
+.conteudo-principal{padding:28px;overflow-y:auto;display:flex;flex-direction:column;gap:28px}
+.secao-titulo{font-size:16px;font-weight:600;color:var(--texto-primario);margin-bottom:16px}
+.barra-busca-servicos{display:flex;gap:10px;align-items:center;margin-bottom:16px}
+.campo-busca{display:flex;align-items:center;gap:8px;background:var(--cinza-700);border:1px solid var(--borda);border-radius:10px;padding:10px 14px;flex:1}
+.campo-busca input{background:none;border:none;color:var(--texto-primario);font-size:13px;outline:none;width:100%}
+.campo-busca input::placeholder{color:var(--texto-terciario)}
+.campo-busca svg{width:14px;height:14px;fill:var(--texto-terciario);flex-shrink:0}
+.campo-select{display:flex;align-items:center;gap:8px;background:var(--cinza-700);border:1px solid var(--borda);border-radius:10px;padding:10px 14px}
+.campo-select select{background:none;border:none;color:var(--texto-secundario);font-size:13px;outline:none;cursor:pointer}
+.botao-buscar{background:var(--lilas-500);color:#fff;border:none;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s;white-space:nowrap}
+.botao-buscar:hover{background:#6a4de0}
+.grade-servicos{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.cartao-servico{padding:18px;border-radius:14px;display:flex;flex-direction:column;justify-content:space-between;min-height:140px;position:relative;overflow:hidden;transition:.2s;cursor:pointer}
+.cartao-servico:hover{transform:translateY(-3px)}
+.cartao-servico:nth-child(1){background:linear-gradient(135deg,#1a1060,#2d1b8a)}
+.cartao-servico:nth-child(2){background:linear-gradient(135deg,#0a3d2b,#0f6b4a)}
+.cartao-servico:nth-child(3){background:linear-gradient(135deg,#3d2810,#7a4a1a)}
+.cabecalho-servico{display:flex;align-items:flex-start;gap:10px}
+.icone-servico{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center}
+.icone-servico svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2}
+.info-servico h3{font-size:14px;font-weight:600;color:#fff;line-height:1.3}
+.info-servico span{font-size:11px;color:rgba(255,255,255,.6);font-weight:400}
+.link-servico{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600;color:rgba(255,255,255,.8);text-decoration:none}
+.link-servico:hover{color:#fff}
+.seta-mini{width:22px;height:22px;border-radius:50%;border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center}
+.seta-mini svg{width:10px;height:10px;fill:none;stroke:rgba(255,255,255,.8);stroke-width:2}
+.rodape-secao{font-size:12px;color:var(--texto-terciario);margin-top:8px}
+.cabecalho-transferencias{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid var(--borda);margin-bottom:18px}
+.opcoes-filtro{display:flex;align-items:center;gap:8px}
+.opcoes-filtro p{font-size:12px;color:var(--texto-terciario)}
+.item-transferencia{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--borda)}
+.item-transferencia:last-child{border-bottom:none}
+.logo-transferencia{width:42px;height:42px;border-radius:12px;background:var(--cinza-100);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-transferencia img{width:55%;display:block}
+.detalhes-transferencia{flex:1;display:flex;gap:16px}
+.detalhe-item{flex:1}
+.detalhe-item dt{font-size:13px;font-weight:500;color:var(--texto-primario)}
+.detalhe-item dd{font-size:11px;color:var(--texto-secundario);margin-top:2px}
+.valor-transferencia{font-size:15px;font-weight:600;color:var(--rosa-500);white-space:nowrap}
+.badge-data{font-size:11px;color:var(--texto-terciario);background:var(--cinza-700);padding:3px 8px;border-radius:20px}
+.barra-lateral{padding:24px;border-left:1px solid var(--borda);display:flex;flex-direction:column;gap:20px}
+.escolha-bandeira{display:flex;align-items:center;justify-content:space-between}
+.escolha-bandeira p{font-size:12px;color:var(--texto-secundario)}
+.botoes-bandeira{display:flex;gap:8px}
+.botao-bandeira{width:52px;height:36px;border-radius:8px;border:1.5px solid var(--borda);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--texto-secundario);transition:.2s;overflow:hidden}
+.botao-bandeira:hover,.botao-bandeira.ativo{background:var(--cinza-100);border-color:var(--cinza-100);color:var(--cinza-800)}
+.botao-bandeira svg{width:32px}
+.lista-pagamentos{display:flex;flex-direction:column;gap:10px}
+.item-pagamento{display:flex;align-items:center;gap:12px;background:var(--cinza-700);border-radius:12px;padding:12px}
+.cartao-mini{width:72px;height:48px;border-radius:8px;display:flex;flex-direction:column;justify-content:space-between;padding:6px 8px;flex-shrink:0}
+.cartao-mini.verde{background:linear-gradient(135deg,#00c97e,#00e5a0)}
+.cartao-mini.lilas{background:linear-gradient(135deg,#6a3ff0,#9b6dff)}
+.cartao-mini.cinza{background:linear-gradient(135deg,#555,#888)}
+.cartao-mini span{font-size:9px;font-weight:600;color:rgba(255,255,255,.85)}
+.cartao-mini span:last-child{align-self:flex-end}
+.dados-pagamento{flex:1}
+.dados-pagamento h3{font-size:13px;font-weight:600;color:var(--texto-primario)}
+.dados-pagamento p{font-size:11px;color:var(--texto-secundario);margin-top:2px}
+.valor-pagamento{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06)}
+.valor-pagamento span{font-size:15px;font-weight:600;color:var(--verde-500)}
+.botao-circulo{width:26px;height:26px;border-radius:50%;border:1px solid var(--borda);background:transparent;color:var(--texto-secundario);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s}
+.botao-circulo:hover{background:var(--cinza-500);color:var(--texto-primario)}
+.botao-circulo svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:2}
+.secao-faq{background:var(--cinza-700);border-radius:12px;padding:16px}
+.secao-faq p{font-size:12px;color:var(--texto-secundario);margin-bottom:12px}
+.campo-pergunta{display:flex;align-items:center;gap:8px;background:var(--cinza-800);border-radius:8px;padding:10px 12px}
+.campo-pergunta label{font-size:12px;color:var(--texto-terciario);white-space:nowrap;padding-right:10px;border-right:1px solid var(--borda);margin-right:4px}
+.campo-pergunta input{background:none;border:none;color:var(--texto-primario);font-size:12px;outline:none;width:100%}
+.campo-pergunta input::placeholder{color:var(--texto-terciario)}
+.rodape-pagamentos{display:flex;align-items:center;justify-content:space-between}
+.botao-salvar{background:transparent;border:1.5px solid var(--lilas-500);color:var(--lilas-200);padding:10px 28px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:.2s}
+.botao-salvar:hover{background:var(--lilas-500);color:#fff}
+.botao-config{display:flex;align-items:center;gap:6px;background:transparent;border:none;color:var(--texto-secundario);font-size:13px;cursor:pointer;padding:10px;border-radius:8px;transition:.2s}
+.botao-config:hover{color:var(--texto-primario);background:var(--cinza-700)}
+.botao-config svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+.ponto-notif{width:8px;height:8px;background:var(--rosa-500);border-radius:50%;display:inline-block;margin-left:4px}
+</style>
+</head>
+<body>
+
+<div class="aplicativo">
+  <header class="cabecalho">
+    <div class="logo">
+      <div class="logo-icone">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="logo-titulo">
+        <span>Almeria</span>
+        <span>NeoBank</span>
+      </div>
+    </div>
+    <nav class="abas">
+      <a href="#">Visão Geral</a>
+      <a href="#" class="ativo">Pagamentos</a>
+      <a href="#">Cartões</a>
+      <a href="#">Conta</a>
+      <a href="#">Sistema</a>
+      <a href="#">Negócios</a>
+    </nav>
+    <div class="acoes-cabecalho">
+      <button class="perfil-usuario">
+        <div class="avatar">MP</div>
+        <span>Matheus Peterson</span>
+      </button>
+      <button class="botao-icone">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </button>
+      <button class="botao-icone" style="position:relative">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="ponto-notif" style="position:absolute;top:6px;right:6px;width:6px;height:6px;margin:0"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="corpo">
+    <nav class="navegacao-lateral">
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Painel
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Agendados
+      </a>
+      <a class="nav-item ativo" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
+        Transferências
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Modelos
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        SWIFT
+      </a>
+      <a class="nav-item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Câmbio
+      </a>
+      <div class="nav-rodape">
+        <p>Almeria ©<br>Todos os direitos<br>reservados 2025</p>
+      </div>
+    </nav>
+
+    <main class="conteudo-principal">
+      <section>
+        <h2 class="secao-titulo">Serviços</h2>
+        <div class="barra-busca-servicos">
+          <div class="campo-busca">
+            <svg viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/></svg>
+            <input type="text" placeholder="Número da conta">
+          </div>
+          <div class="campo-select">
+            <select>
+              <option>Casa</option>
+              <option>Trabalho</option>
+            </select>
+          </div>
+          <button class="botao-buscar">Buscar</button>
+        </div>
+        <div class="grade-servicos">
+          <article class="cartao-servico">
+            <div class="cabecalho-servico">
+              <div class="icone-servico">
+                <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              </div>
+              <div class="info-servico">
+                <h3>Eletricidade</h3>
+                <span>UrkEnergo LTDA.</span>
+              </div>
+            </div>
+            <a href="#" class="link-servico">
+              <span>Acessar serviço</span>
+              <div class="seta-mini"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+          </article>
+          <article class="cartao-servico">
+            <div class="cabecalho-servico">
+              <div class="icone-servico">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+              </div>
+              <div class="info-servico">
+                <h3>Gás Aquecimento</h3>
+                <span>Gazprom UA</span>
+              </div>
+            </div>
+            <a href="#" class="link-servico">
+              <span>Acessar serviço</span>
+              <div class="seta-mini"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+          </article>
+          <article class="cartao-servico">
+            <div class="cabecalho-servico">
+              <div class="icone-servico">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              </div>
+              <div class="info-servico">
+                <h3>Imposto Online</h3>
+                <span>Kharkov, rua 62</span>
+              </div>
+            </div>
+            <a href="#" class="link-servico">
+              <span>Acessar serviço</span>
+              <div class="seta-mini"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></div>
+            </a>
+          </article>
+        </div>
+        <p class="rodape-secao">Os serviços são pagos de acordo com a cotação de câmbio e tarifas vigentes.</p>
+      </section>
+
+      <section>
+        <div class="cabecalho-transferencias">
+          <h2 class="secao-titulo" style="margin-bottom:0">Últimas Transferências</h2>
+          <div class="opcoes-filtro">
+            <p>Filtro: acima de R$ 100</p>
+            <button class="botao-icone" style="width:32px;height:32px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            </button>
+            <button class="botao-icone" style="width:32px;height:32px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
+        <div>
+          <div class="item-transferencia">
+            <div class="logo-transferencia"><img src="https://assets.codepen.io/285131/apple.svg" alt="Apple"></div>
+            <div class="detalhes-transferencia">
+              <div class="detalhe-item"><dt>Apple Inc.</dt><dd>Pagamento Apple ID</dd></div>
+              <div class="detalhe-item"><dt>4012</dt><dd>Últimos quatro dígitos</dd></div>
+              <div class="detalhe-item"><dt><span class="badge-data">28 out. 21</span></dt><dd>Data do pagamento</dd></div>
+            </div>
+            <div class="valor-transferencia">- R$ 550</div>
+          </div>
+          <div class="item-transferencia">
+            <div class="logo-transferencia"><img src="https://assets.codepen.io/285131/pinterest.svg" alt="Pinterest"></div>
+            <div class="detalhes-transferencia">
+              <div class="detalhe-item"><dt>Pinterest</dt><dd>Assinatura 2 anos</dd></div>
+              <div class="detalhe-item"><dt>5214</dt><dd>Últimos quatro dígitos</dd></div>
+              <div class="detalhe-item"><dt><span class="badge-data">26 out. 21</span></dt><dd>Data do pagamento</dd></div>
+            </div>
+            <div class="valor-transferencia">- R$ 120</div>
+          </div>
+          <div class="item-transferencia">
+            <div class="logo-transferencia"><img src="https://assets.codepen.io/285131/warner-bros.svg" alt="Warner Bros"></div>
+            <div class="detalhes-transferencia">
+              <div class="detalhe-item"><dt>Warner Bros.</dt><dd>Cinema</dd></div>
+              <div class="detalhe-item"><dt>2228</dt><dd>Últimos quatro dígitos</dd></div>
+              <div class="detalhe-item"><dt><span class="badge-data">22 out. 21</span></dt><dd>Data do pagamento</dd></div>
+            </div>
+            <div class="valor-transferencia">- R$ 70</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="barra-lateral">
+      <h2 class="secao-titulo">Novo Pagamento</h2>
+      <div class="escolha-bandeira">
+        <p>Escolha um cartão</p>
+        <div class="botoes-bandeira">
+          <button class="botao-bandeira">
+            <svg width="2001" height="1237" viewBox="0 0 2001 1237" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1270.57 1104.15H729.71V132.15H1270.58L1270.57 1104.15Z" fill="currentColor"/>
+              <path d="M764 618.17C764 421 856.32 245.36 1000.08 132.17C891.261 46.3647 756.669 -0.204758 618.09 9.6031e-07C276.72 9.6031e-07 0 276.76 0 618.17C0 959.58 276.72 1236.34 618.09 1236.34C756.672 1236.55 891.268 1189.98 1000.09 1104.17C856.34 991 764 815.35 764 618.17Z" fill="currentColor"/>
+              <path d="M2000.25 618.17C2000.25 959.58 1723.53 1236.34 1382.16 1236.34C1243.56 1236.54 1108.95 1189.97 1000.11 1104.17C1143.91 990.98 1236.23 815.35 1236.23 618.17C1236.23 420.99 1143.91 245.36 1000.11 132.17C1108.95 46.3673 1243.56 -0.201169 1382.15 -2.24915e-05C1723.52 -2.24915e-05 2000.24 276.76 2000.24 618.17" fill="currentColor"/>
+            </svg>
+          </button>
+          <button class="botao-bandeira ativo">
+            <svg xmlns="http://www.w3.org/2000/svg" width="2500" height="2500" viewBox="0 0 141.732 141.732">
+              <g fill="currentColor">
+                <path d="M62.935 89.571h-9.733l6.083-37.384h9.734zM45.014 52.187L35.735 77.9l-1.098-5.537.001.002-3.275-16.812s-.396-3.366-4.617-3.366h-15.34l-.18.633s4.691.976 10.181 4.273l8.456 32.479h10.141l15.485-37.385H45.014zM121.569 89.571h8.937l-7.792-37.385h-7.824c-3.613 0-4.493 2.786-4.493 2.786L95.881 89.571h10.146l2.029-5.553h12.373l1.14 5.553zm-10.71-13.224l5.114-13.99 2.877 13.99h-7.991zM96.642 61.177l1.389-8.028s-4.286-1.63-8.754-1.63c-4.83 0-16.3 2.111-16.3 12.376 0 9.658 13.462 9.778 13.462 14.851s-12.075 4.164-16.06.965l-1.447 8.394s4.346 2.111 10.986 2.111c6.642 0 16.662-3.439 16.662-12.799 0-9.72-13.583-10.625-13.583-14.851.001-4.227 9.48-3.684 13.645-1.389z"/>
+              </g>
+              <path d="M34.638 72.364l-3.275-16.812s-.396-3.366-4.617-3.366h-15.34l-.18.633s7.373 1.528 14.445 7.253c6.762 5.472 8.967 12.292 8.967 12.292z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="lista-pagamentos">
+        <div class="item-pagamento">
+          <div class="cartao-mini verde"><span>01/26</span><span>•••• 4012</span></div>
+          <div class="dados-pagamento">
+            <h3>Internet</h3>
+            <div class="valor-pagamento">
+              <span>R$ 2.110</span>
+              <button class="botao-circulo"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <div class="item-pagamento">
+          <div class="cartao-mini lilas"><span>12/27</span><span>•••• 2228</span></div>
+          <div class="dados-pagamento">
+            <h3>Universal</h3>
+            <div class="valor-pagamento">
+              <span>R$ 5.621</span>
+              <button class="botao-circulo"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <div class="item-pagamento">
+          <div class="cartao-mini cinza"><span>03/26</span><span>•••• 5214</span></div>
+          <div class="dados-pagamento">
+            <h3>Ouro</h3>
+            <div class="valor-pagamento">
+              <span>R$ 3.473</span>
+              <button class="botao-circulo"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="secao-faq">
+        <p>Perguntas frequentes</p>
+        <div class="campo-pergunta">
+          <label>Pergunta</label>
+          <input type="text" placeholder="Digite aqui...">
+        </div>
+      </div>
+
+      <div class="rodape-pagamentos">
+        <button class="botao-salvar">Salvar</button>
+        <button class="botao-config">
+          <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Mais configurações
+        </button>
+      </div>
+    </aside>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Almeria NeoBank</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --c900: #080810;
+  --c800: #0f0f1a;
+  --c700: #161622;
+  --c600: #1e1e2e;
+  --c500: #2a2a40;
+  --c400: #3d3d58;
+  --c300: #7070a0;
+  --c200: #a0a0c0;
+  --c100: #e8e8f5;
+
+  --verde: #00f5a8;
+  --verde-dim: rgba(0,245,168,0.12);
+  --lilas: #8b5cf6;
+  --lilas-dim: rgba(139,92,246,0.15);
+  --rosa: #f472b6;
+  --rosa-dim: rgba(244,114,182,0.12);
+  --ambar: #fbbf24;
+  --ambar-dim: rgba(251,191,36,0.12);
+  --azul: #60a5fa;
+  --azul-dim: rgba(96,165,250,0.12);
+
+  --tp: #eeeef8;
+  --ts: #7070a0;
+  --tt: #3d3d58;
+  --borda: rgba(255,255,255,0.06);
+  --borda-hover: rgba(255,255,255,0.12);
+
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-full: 999px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--c900);
+  color: var(--tp);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button, select, input { font: inherit; }
+
+/* ═══════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--c800); }
+::-webkit-scrollbar-thumb { background: var(--c500); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--c400); }
+
+/* ═══════════════════════════════════════════
+   LAYOUT PRINCIPAL
+═══════════════════════════════════════════ */
+.app {
+  display: grid;
+  grid-template-rows: 64px 1fr;
+  grid-template-columns: 200px 1fr 360px;
+  grid-template-areas:
+    "cabecalho cabecalho cabecalho"
+    "nav       conteudo  lateral";
+  min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════
+   CABEÇALHO
+═══════════════════════════════════════════ */
+.cabecalho {
+  grid-area: cabecalho;
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--borda);
+  background: var(--c800);
+  gap: 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  width: 172px;
+}
+
+.logo-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--lilas), var(--verde));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-icon svg { width: 18px; height: 18px; }
+
+.logo-texto {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.logo-texto strong {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tp);
+}
+
+.logo-texto small {
+  font-size: 10px;
+  color: var(--ts);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+.abas-cabecalho {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+}
+
+.aba {
+  padding: 7px 16px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ts);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+  white-space: nowrap;
+}
+
+.aba:hover { color: var(--tp); background: var(--c600); }
+
+.aba.ativo {
+  color: var(--tp);
+  background: var(--c600);
+  position: relative;
+}
+
+.aba.ativo::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: var(--lilas);
+  border-radius: 99px;
+}
+
+.acoes-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.btn-perfil {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--c600);
+  border: 1px solid var(--borda-hover);
+  border-radius: var(--r-full);
+  padding: 6px 14px 6px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--tp);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.btn-perfil:hover { background: var(--c500); }
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--lilas), var(--rosa));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--borda);
+  background: transparent;
+  color: var(--ts);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.btn-icon:hover { background: var(--c600); color: var(--tp); border-color: var(--borda-hover); }
+
+.notif-dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 6px;
+  height: 6px;
+  background: var(--rosa);
+  border-radius: 50%;
+  border: 1.5px solid var(--c800);
+}
+
+/* ═══════════════════════════════════════════
+   NAVEGAÇÃO LATERAL
+═══════════════════════════════════════════ */
+.nav-lateral {
+  grid-area: nav;
+  padding: 24px 14px;
+  border-right: 1px solid var(--borda);
+  background: var(--c800);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--r-md);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ts);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+.nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-item:hover { background: var(--c700); color: var(--tp); }
+
+.nav-item.ativo {
+  background: var(--lilas-dim);
+  color: #c4b5fd;
+  border: 1px solid rgba(139,92,246,0.2);
+}
+
+.nav-item.ativo svg { color: var(--lilas); }
+
+.nav-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--tt);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 12px 12px 4px;
+  margin-top: 4px;
+}
+
+.nav-rodape {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--borda);
+}
+
+.nav-rodape p {
+  font-size: 11px;
+  color: var(--tt);
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════
+   CONTEÚDO PRINCIPAL
+═══════════════════════════════════════════ */
+.conteudo {
+  grid-area: conteudo;
+  padding: 28px;
+  overflow-y: auto;
+  height: calc(100vh - 64px);
+  display: none;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.conteudo.ativo { display: flex; }
+
+/* ═══════════════════════════════════════════
+   SIDEBAR DIREITA
+═══════════════════════════════════════════ */
+.lateral {
+  grid-area: lateral;
+  padding: 24px;
+  border-left: 1px solid var(--borda);
+  background: var(--c800);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+/* ═══════════════════════════════════════════
+   CARDS GENÉRICOS
+═══════════════════════════════════════════ */
+.card {
+  background: var(--c700);
+  border: 1px solid var(--borda);
+  border-radius: var(--r-xl);
+  padding: 20px;
+}
+
+.card-titulo {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tp);
+  margin-bottom: 2px;
+}
+
+.card-sub {
+  font-size: 12px;
+  color: var(--ts);
+  margin-bottom: 16px;
+}
+
+.separador {
+  height: 1px;
+  background: var(--borda);
+  margin: 6px 0;
+}
+
+/* ═══════════════════════════════════════════
+   PAINEL — CARDS DE MÉTRICAS
+═══════════════════════════════════════════ */
+.saudacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.saudacao h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--tp);
+}
+
+.saudacao span {
+  font-size: 13px;
+  color: var(--ts);
+}
+
+.grade-metricas {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.card-metrica {
+  background: var(--c700);
+  border: 1px solid var(--borda);
+  border-radius: var(--r-xl);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s;
+}
+
+.card-metrica:hover {
+  border-color: var(--borda-hover);
+  transform: translateY(-2px);
+}
+
+.card-metrica::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 0 0 var(--r-xl) var(--r-xl);
+}
+
+.card-metrica.verde::before { background: var(--verde); }
+.card-metrica.lilas::before { background: var(--lilas); }
+.card-metrica.ambar::before { background: var(--ambar); }
+.card-metrica.rosa::before { background: var(--rosa); }
+
+.metrica-label {
+  font-size: 12px;
+  color: var(--ts);
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metrica-label .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.metrica-valor {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--tp);
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.metrica-var {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.metrica-var.pos { color: var(--verde); }
+.metrica-var.neg { color: var(--rosa); }
+
+.metrica-var svg { width: 11px; height: 11px; }
+
+.barra-uso {
+  margin-top: 10px;
+}
+
+.barra-uso-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--ts);
+  margin-bottom: 6px;
+}
+
+.trilho {
+  height: 5px;
+  background: var(--c500);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.trilho-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: var(--ambar);
+  transition: width 1s ease;
+}
+
+/* ═══════════════════════════════════════════
+   PAINEL — GRÁFICOS
+═══════════════════════════════════════════ */
+.grade-graficos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.legenda-grafico {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ts);
+}
+
+.leg-cor {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.grafico-wrap {
+  position: relative;
+  width: 100%;
+}
+
+/* ═══════════════════════════════════════════
+   INVESTIMENTOS
+═══════════════════════════════════════════ */
+.lista-ativos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ativo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: var(--r-md);
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.ativo-item:hover { background: var(--c600); }
+
+.ativo-ticker {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+.ativo-info { flex: 1; min-width: 0; }
+.ativo-nome { font-size: 13px; font-weight: 500; color: var(--tp); }
+.ativo-qtd { font-size: 11px; color: var(--ts); margin-top: 1px; }
+
+.ativo-dados { text-align: right; }
+.ativo-preco { font-size: 13px; font-weight: 600; color: var(--tp); }
+.ativo-var { font-size: 11px; font-weight: 500; margin-top: 2px; }
+.pos { color: var(--verde); }
+.neg { color: var(--rosa); }
+
+/* ═══════════════════════════════════════════
+   PIX
+═══════════════════════════════════════════ */
+.chave-pix {
+  background: var(--c600);
+  border-radius: var(--r-lg);
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--borda);
+}
+
+.chave-pix-info small { font-size: 11px; color: var(--ts); }
+.chave-pix-info span { display: block; font-size: 13px; font-weight: 500; color: var(--tp); margin-top: 2px; }
+
+.btn-copiar {
+  background: var(--lilas);
+  color: white;
+  border: none;
+  border-radius: var(--r-sm);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: var(--font-body);
+}
+
+.btn-copiar:hover { background: #7c3aed; }
+.btn-copiar:active { transform: scale(0.97); }
+
+.grade-pix {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.btn-pix {
+  background: var(--c600);
+  border: 1px solid var(--borda);
+  border-radius: var(--r-lg);
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--tp);
+  font-family: var(--font-body);
+}
+
+.btn-pix:hover {
+  background: var(--c500);
+  border-color: var(--borda-hover);
+  transform: translateY(-2px);
+}
+
+.btn-pix:active { transform: scale(0.97); }
+
+.btn-pix-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-pix-icon svg { width: 18px; height: 18px; }
+.btn-pix span { font-size: 12px; font-weight: 500; color: var(--ts); }
+
+/* ═══════════════════════════════════════════
+   PAGAMENTOS — ÚLTIMAS TRANSAÇÕES
+═══════════════════════════════════════════ */
+.lista-transacoes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.transacao-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: var(--r-md);
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.transacao-item:hover { background: var(--c600); }
+
+.transacao-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  background: var(--c100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.transacao-logo img { width: 55%; }
+
+.transacao-logo-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.transacao-logo-icon svg { width: 18px; height: 18px; }
+
+.transacao-info { flex: 1; min-width: 0; }
+.transacao-nome { font-size: 13px; font-weight: 500; color: var(--tp); }
+.transacao-desc { font-size: 11px; color: var(--ts); margin-top: 1px; }
+
+.transacao-valor {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge-data {
+  display: inline-flex;
+  align-items: center;
+  background: var(--c500);
+  border-radius: 99px;
+  padding: 2px 8px;
+  font-size: 10px;
+  color: var(--ts);
+  margin-top: 3px;
+}
+
+/* ═══════════════════════════════════════════
+   SEÇÃO PAGAMENTOS (ABA)
+═══════════════════════════════════════════ */
+.grade-pagamentos-topo {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 14px;
+}
+
+.card-cartao {
+  background: var(--c700);
+  border: 1px solid var(--borda);
+  border-radius: var(--r-xl);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s;
+  cursor: pointer;
+}
+
+.card-cartao:hover { border-color: var(--borda-hover); transform: translateY(-3px); }
+
+.cartao-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.cartao-bandeira svg { width: 36px; opacity: 0.8; }
+
+.cartao-chip {
+  width: 28px;
+  height: 22px;
+  background: linear-gradient(135deg, var(--ambar), #f59e0b);
+  border-radius: 4px;
+  opacity: 0.8;
+}
+
+.cartao-numero {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tp);
+  letter-spacing: 0.12em;
+  margin-bottom: 8px;
+}
+
+.cartao-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.cartao-validade small { font-size: 9px; color: var(--ts); }
+.cartao-validade span { display: block; font-size: 13px; font-weight: 500; color: var(--tp); }
+
+.cartao-tipo {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.badge-cartao {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--verde-dim);
+  color: var(--verde);
+  border: 1px solid rgba(0,245,168,0.2);
+  border-radius: 99px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.cartao-c1 { background: linear-gradient(135deg, #1a0050, #2d0080); }
+.cartao-c2 { background: linear-gradient(135deg, #001a40, #003080); }
+.cartao-c3 { background: linear-gradient(135deg, #1a1a00, #3a3a00); }
+
+.grade-pag-inferior {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.form-pagamento {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.campo-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo-form label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ts);
+}
+
+.campo-form input,
+.campo-form select {
+  background: var(--c600);
+  border: 1px solid var(--borda);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--tp);
+  outline: none;
+  transition: all 0.2s;
+}
+
+.campo-form input:focus,
+.campo-form select:focus {
+  border-color: var(--lilas);
+  background: var(--c500);
+}
+
+.campo-form input::placeholder { color: var(--tt); }
+.campo-form select option { background: var(--c700); }
+
+.grade-campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-pagar {
+  background: linear-gradient(135deg, var(--lilas), #a855f7);
+  color: white;
+  border: none;
+  border-radius: var(--r-md);
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+  margin-top: 4px;
+}
+
+.btn-pagar:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-pagar:active { transform: scale(0.99); }
+
+/* ═══════════════════════════════════════════
+   BARRA LATERAL — NOVO PAGAMENTO
+═══════════════════════════════════════════ */
+.lateral-titulo {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--tp);
+}
+
+.cartoes-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cartao-mini-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--c700);
+  border: 1px solid var(--borda);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cartao-mini-item:hover { border-color: var(--borda-hover); background: var(--c600); }
+
+.cartao-mini-item.selecionado {
+  border-color: rgba(139,92,246,0.4);
+  background: var(--lilas-dim);
+}
+
+.cartao-mini-vis {
+  width: 52px;
+  height: 34px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5px 7px;
+  flex-shrink: 0;
+}
+
+.cartao-mini-vis span {
+  font-size: 8px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+}
+
+.cartao-mini-vis span:last-child { align-self: flex-end; }
+
+.cartao-mini-vis.verde { background: linear-gradient(135deg, #00c97e, #00e5a0); }
+.cartao-mini-vis.lilas { background: linear-gradient(135deg, #6a3ff0, #9b6dff); }
+.cartao-mini-vis.escuro { background: linear-gradient(135deg, #333, #555); }
+
+.cartao-mini-dados { flex: 1; }
+.cartao-mini-dados h4 { font-size: 13px; font-weight: 500; color: var(--tp); }
+.cartao-mini-dados p { font-size: 11px; color: var(--ts); margin-top: 2px; }
+
+.cartao-mini-saldo {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--verde);
+}
+
+.faq-lateral {
+  background: var(--c700);
+  border: 1px solid var(--borda);
+  border-radius: var(--r-xl);
+  padding: 16px;
+}
+
+.faq-lateral p { font-size: 12px; color: var(--ts); margin-bottom: 10px; }
+
+.campo-faq {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--c800);
+  border: 1px solid var(--borda);
+  border-radius: var(--r-md);
+  padding: 10px 12px;
+}
+
+.campo-faq label {
+  font-size: 12px;
+  color: var(--tt);
+  padding-right: 10px;
+  border-right: 1px solid var(--borda);
+  white-space: nowrap;
+}
+
+.campo-faq input {
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: var(--tp);
+  outline: none;
+  width: 100%;
+}
+
+.campo-faq input::placeholder { color: var(--tt); }
+
+.rodape-lateral {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.btn-salvar {
+  background: transparent;
+  border: 1.5px solid var(--lilas);
+  color: #c4b5fd;
+  border-radius: var(--r-md);
+  padding: 10px 24px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+
+.btn-salvar:hover { background: var(--lilas); color: white; }
+
+.btn-config {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  color: var(--ts);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: var(--r-md);
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+
+.btn-config:hover { color: var(--tp); background: var(--c700); }
+.btn-config svg { width: 14px; height: 14px; }
+
+/* ═══════════════════════════════════════════
+   SERVIÇOS (ÁREA CENTRAL PAGAMENTOS)
+═══════════════════════════════════════════ */
+.grade-servicos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.cartao-servico {
+  padding: 20px;
+  border-radius: var(--r-xl);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 160px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.cartao-servico:hover { transform: translateY(-4px); }
+
+.cartao-servico-1 { background: linear-gradient(135deg, #1a0060, #2e0090); border-color: rgba(139,92,246,0.2); }
+.cartao-servico-2 { background: linear-gradient(135deg, #003020, #005040); border-color: rgba(0,245,168,0.15); }
+.cartao-servico-3 { background: linear-gradient(135deg, #402000, #704000); border-color: rgba(251,191,36,0.15); }
+
+.servico-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.servico-icone {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r-md);
+  background: rgba(255,255,255,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.servico-icone svg { width: 20px; height: 20px; }
+
+.servico-titulo {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  line-height: 1.3;
+}
+
+.servico-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  margin-top: 2px;
+}
+
+.servico-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.75);
+}
+
+.servico-link:hover { color: white; }
+
+.seta-mini {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seta-mini svg { width: 10px; height: 10px; }
+
+/* ═══════════════════════════════════════════
+   FILTRO TRANSFERÊNCIAS
+═══════════════════════════════════════════ */
+.header-secao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--borda);
+  margin-bottom: 4px;
+}
+
+.header-secao h3 {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--tp);
+}
+
+.filtros {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filtros p {
+  font-size: 12px;
+  color: var(--ts);
+}
+
+/* ═══════════════════════════════════════════
+   ANIMAÇÕES
+═══════════════════════════════════════════ */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animar {
+  animation: fadeInUp 0.4s ease both;
+}
+
+.animar:nth-child(1) { animation-delay: 0.05s; }
+.animar:nth-child(2) { animation-delay: 0.1s; }
+.animar:nth-child(3) { animation-delay: 0.15s; }
+.animar:nth-child(4) { animation-delay: 0.2s; }
+.animar:nth-child(5) { animation-delay: 0.25s; }
+.animar:nth-child(6) { animation-delay: 0.3s; }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVO
+═══════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .app {
+    grid-template-columns: 180px 1fr;
+    grid-template-areas:
+      "cabecalho cabecalho"
+      "nav       conteudo";
+  }
+  .lateral { display: none; }
+  .abas-cabecalho { display: none; }
+}
+
+@media (max-width: 700px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "cabecalho"
+      "conteudo";
+  }
+  .nav-lateral { display: none; }
+  .grade-metricas { grid-template-columns: 1fr; }
+  .grade-graficos { grid-template-columns: 1fr; }
+  .grade-servicos { grid-template-columns: 1fr; }
+  .grade-pagamentos-topo { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ═══ CABEÇALHO ═══ -->
+  <header class="cabecalho">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="logo-texto">
+        <strong>Almeria</strong>
+        <small>NeoBank</small>
+      </div>
+    </div>
+
+    <nav class="abas-cabecalho">
+      <button class="aba ativo" onclick="trocarAba('painel', this)">Visão Geral</button>
+      <button class="aba" onclick="trocarAba('pagamentos', this)">Pagamentos</button>
+      <button class="aba" onclick="trocarAba('pix', this)">Pix</button>
+      <button class="aba">Cartões</button>
+      <button class="aba">Conta</button>
+      <button class="aba">Negócios</button>
+    </nav>
+
+    <div class="acoes-header">
+      <button class="btn-perfil">
+        <div class="avatar">MP</div>
+        <span>Matheus Peterson</span>
+      </button>
+      <button class="btn-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </button>
+      <button class="btn-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <span class="notif-dot"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══ NAVEGAÇÃO LATERAL ═══ -->
+  <nav class="nav-lateral">
+    <span class="nav-section-label">Menu</span>
+
+    <button class="nav-item ativo" onclick="trocarNav('painel', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      Painel
+    </button>
+
+    <button class="nav-item" onclick="trocarNav('pagamentos', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+      </svg>
+      Pagamentos
+    </button>
+
+    <button class="nav-item" onclick="trocarNav('pix', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/>
+      </svg>
+      Pix
+    </button>
+
+    <button class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+      </svg>
+      Agendados
+    </button>
+
+    <button class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+      </svg>
+      Modelos
+    </button>
+
+    <span class="nav-section-label">Mercado</span>
+
+    <button class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+      </svg>
+      SWIFT
+    </button>
+
+    <button class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>
+      </svg>
+      Câmbio
+    </button>
+
+    <div class="nav-rodape">
+      <p>Almeria NeoBank ©<br>Todos os direitos<br>reservados 2025</p>
+    </div>
+  </nav>
+
+  <!-- ═══════════════════════════════════
+       ABA: PAINEL
+  ════════════════════════════════════ -->
+  <main class="conteudo ativo" id="painel">
+
+    <div class="saudacao animar">
+      <h2>Bom dia, Matheus 👋</h2>
+      <span>Quinta-feira, 09 de abril de 2026</span>
+    </div>
+
+    <!-- Métricas -->
+    <div class="grade-metricas">
+      <div class="card-metrica verde animar">
+        <div class="metrica-label">
+          <span class="dot" style="background:var(--verde)"></span>
+          Saldo disponível
+        </div>
+        <div class="metrica-valor">R$ 12.847,50</div>
+        <div class="metrica-var pos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+          +R$ 1.240 este mês
+        </div>
+      </div>
+
+      <div class="card-metrica rosa animar">
+        <div class="metrica-label">
+          <span class="dot" style="background:var(--rosa)"></span>
+          Gastos do mês
+        </div>
+        <div class="metrica-valor">R$ 3.620,00</div>
+        <div class="metrica-var neg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          +8% vs mês anterior
+        </div>
+      </div>
+
+      <div class="card-metrica lilas animar">
+        <div class="metrica-label">
+          <span class="dot" style="background:var(--lilas)"></span>
+          Investimentos
+        </div>
+        <div class="metrica-valor">R$ 28.410,00</div>
+        <div class="metrica-var pos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+          +2,4% este mês
+        </div>
+      </div>
+
+      <div class="card-metrica ambar animar">
+        <div class="metrica-label">
+          <span class="dot" style="background:var(--ambar)"></span>
+          Limite do cartão
+        </div>
+        <div class="metrica-valor">R$ 6.380,00</div>
+        <div class="barra-uso">
+          <div class="barra-uso-info">
+            <span>Usado: 63,8%</span>
+            <span>Limite: R$ 10.000</span>
+          </div>
+          <div class="trilho">
+            <div class="trilho-fill" style="width: 63.8%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="grade-graficos">
+      <div class="card animar">
+        <div class="card-titulo">Gastos por categoria</div>
+        <div class="card-sub">Abril 2026 — total R$ 3.620</div>
+        <div class="legenda-grafico">
+          <span class="leg-item"><span class="leg-cor" style="background:#8b5cf6"></span>Moradia R$ 1.200</span>
+          <span class="leg-item"><span class="leg-cor" style="background:#00f5a8"></span>Alimentação R$ 820</span>
+          <span class="leg-item"><span class="leg-cor" style="background:#f472b6"></span>Lazer R$ 540</span>
+          <span class="leg-item"><span class="leg-cor" style="background:#fbbf24"></span>Transporte R$ 380</span>
+          <span class="leg-item"><span class="leg-cor" style="background:#60a5fa"></span>Outros R$ 680</span>
+        </div>
+        <div class="grafico-wrap" style="height:200px">
+          <canvas id="grafico-cat" role="img" aria-label="Gastos por categoria em abril">Moradia 1200, Alimentação 820, Lazer 540, Transporte 380, Outros 680.</canvas>
+        </div>
+      </div>
+
+      <div class="card animar">
+        <div class="card-titulo">Evolução do saldo</div>
+        <div class="card-sub">Últimos 7 meses</div>
+        <div class="grafico-wrap" style="height:200px; margin-top: 8px;">
+          <canvas id="grafico-evolucao" role="img" aria-label="Evolução do saldo nos últimos 7 meses">Out 9200, Nov 10100, Dez 8800, Jan 11200, Fev 10400, Mar 11600, Abr 12847.</canvas>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--borda)">
+          <div>
+            <div style="font-size:11px;color:var(--ts)">Menor saldo</div>
+            <div style="font-size:15px;font-weight:700;color:var(--rosa);font-family:var(--font-display)">R$ 8.800</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:var(--ts)">Maior saldo</div>
+            <div style="font-size:15px;font-weight:700;color:var(--verde);font-family:var(--font-display)">R$ 12.847</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Investimentos -->
+    <div class="card animar">
+      <div class="card-titulo">Carteira de investimentos</div>
+      <div class="card-sub">Rendimento total este mês: +R$ 672,00</div>
+      <div class="lista-ativos">
+        <div class="ativo-item">
+          <div class="ativo-ticker" style="background:#1a0060;color:#c4b5fd">PETR4</div>
+          <div class="ativo-info">
+            <div class="ativo-nome">Petrobras PN</div>
+            <div class="ativo-qtd">120 ações · R$ 41,00/ação</div>
+          </div>
+          <div class="ativo-dados">
+            <div class="ativo-preco">R$ 4.920,00</div>
+            <div class="ativo-var pos">+3,2%</div>
+          </div>
+        </div>
+        <div class="separador"></div>
+        <div class="ativo-item">
+          <div class="ativo-ticker" style="background:#003020;color:#00f5a8">VALE3</div>
+          <div class="ativo-info">
+            <div class="ativo-nome">Vale ON</div>
+            <div class="ativo-qtd">85 ações · R$ 75,00/ação</div>
+          </div>
+          <div class="ativo-dados">
+            <div class="ativo-preco">R$ 6.375,00</div>
+            <div class="ativo-var pos">+1,8%</div>
+          </div>
+        </div>
+        <div class="separador"></div>
+        <div class="ativo-item">
+          <div class="ativo-ticker" style="background:#3a2000;color:#fbbf24">CDB</div>
+          <div class="ativo-info">
+            <div class="ativo-nome">CDB 120% CDI</div>
+            <div class="ativo-qtd">Renda fixa · Venc. 12/2026</div>
+          </div>
+          <div class="ativo-dados">
+            <div class="ativo-preco">R$ 15.000,00</div>
+            <div class="ativo-var pos">+0,9%</div>
+          </div>
+        </div>
+        <div class="separador"></div>
+        <div class="ativo-item">
+          <div class="ativo-ticker" style="background:#2a0030;color:#f472b6">ITUB4</div>
+          <div class="ativo-info">
+            <div class="ativo-nome">Itaú Unibanco PN</div>
+            <div class="ativo-qtd">60 ações · R$ 35,25/ação</div>
+          </div>
+          <div class="ativo-dados">
+            <div class="ativo-preco">R$ 2.115,00</div>
+            <div class="ativo-var neg">-0,5%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Últimas transações -->
+    <div class="card animar">
+      <div class="header-secao">
+        <h3>Últimas transações</h3>
+        <div class="filtros">
+          <p>Filtro: acima de R$ 100</p>
+          <button class="btn-icon" style="width:30px;height:30px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="lista-transacoes">
+        <div class="transacao-item">
+          <div class="transacao-logo"><img src="https://assets.codepen.io/285131/apple.svg" alt="Apple"></div>
+          <div class="transacao-info">
+            <div class="transacao-nome">Apple Inc.</div>
+            <div class="transacao-desc">Apple ID Payment · <span class="badge-data">28 out. 21</span></div>
+          </div>
+          <div class="transacao-valor neg">- R$ 550,00</div>
+        </div>
+        <div class="separador"></div>
+        <div class="transacao-item">
+          <div class="transacao-logo"><img src="https://assets.codepen.io/285131/pinterest.svg" alt="Pinterest"></div>
+          <div class="transacao-info">
+            <div class="transacao-nome">Pinterest</div>
+            <div class="transacao-desc">Assinatura 2 anos · <span class="badge-data">26 out. 21</span></div>
+          </div>
+          <div class="transacao-valor neg">- R$ 120,00</div>
+        </div>
+        <div class="separador"></div>
+        <div class="transacao-item">
+          <div class="transacao-logo"><img src="https://assets.codepen.io/285131/warner-bros.svg" alt="Warner Bros"></div>
+          <div class="transacao-info">
+            <div class="transacao-nome">Warner Bros.</div>
+            <div class="transacao-desc">Cinema · <span class="badge-data">22 out. 21</span></div>
+          </div>
+          <div class="transacao-valor neg">- R$ 70,00</div>
+        </div>
+        <div class="separador"></div>
+        <div class="transacao-item">
+          <div class="transacao-logo-icon" style="background:#003020">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#00f5a8" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div class="transacao-info">
+            <div class="transacao-nome">Pix recebido</div>
+            <div class="transacao-desc">João Silva · <span class="badge-data">03 abr. 26</span></div>
+          </div>
+          <div class="transacao-valor pos">+ R$ 2.000,00</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ═══════════════════════════════════
+       ABA: PAGAMENTOS
+  ════════════════════════════════════ -->
+  <main class="conteudo" id="pagamentos">
+
+    <!-- Serviços -->
+    <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px" class="animar">
+        <div>
+          <h2 style="font-family:var(--font-display);font-size:18px;font-weight:700">Serviços</h2>
+          <p style="font-size:12px;color:var(--ts);margin-top:2px">Contas e serviços vinculados</p>
+        </div>
+        <div style="display:flex;gap:10px">
+          <div style="display:flex;align-items:center;gap:8px;background:var(--c700);border:1px solid var(--borda);border-radius:var(--r-md);padding:9px 14px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--ts)" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" placeholder="Número da conta" style="background:none;border:none;color:var(--tp);font-size:13px;outline:none;width:140px">
+          </div>
+          <button class="btn-pagar" style="padding:9px 18px;font-size:13px;margin-top:0">Buscar</button>
+        </div>
+      </div>
+      <div class="grade-servicos">
+        <div class="cartao-servico cartao-servico-1 animar">
+          <div class="servico-header">
+            <div class="servico-icone">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div>
+              <div class="servico-titulo">Eletricidade</div>
+              <div class="servico-sub">UrkEnergo LTDA.</div>
+            </div>
+          </div>
+          <div class="servico-link">
+            <span>Acessar serviço</span>
+            <div class="seta-mini"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+          </div>
+        </div>
+        <div class="cartao-servico cartao-servico-2 animar">
+          <div class="servico-header">
+            <div class="servico-icone">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#00f5a8" stroke-width="2"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10"/><path d="M12 6v6l4 2"/></svg>
+            </div>
+            <div>
+              <div class="servico-titulo">Gás Aquecimento</div>
+              <div class="servico-sub">Gazprom UA</div>
+            </div>
+          </div>
+          <div class="servico-link">
+            <span>Acessar serviço</span>
+            <div class="seta-mini"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+          </div>
+        </div>
+        <div class="cartao-servico cartao-servico-3 animar">
+          <div class="servico-header">
+            <div class="servico-icone">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div>
+              <div class="servico-titulo">Imposto Online</div>
+              <div class="servico-sub">Kharkov, rua 62</div>
+            </div>
+          </div>
+          <div class="servico-link">
+            <span>Acessar serviço</span>
+            <div class="seta-mini"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--tt);margin-top:10px">Os serviços são pagos de acordo com a cotação de câmbio e tarifas vigentes.</p>
+    </div>
+
+    <!-- Cartões -->
+    <div class="animar">
+      <h3 style="font-family:var(--font-display);font-size:15px;font-weight:600;margin-bottom:14px">Meus cartões</h3>
+      <div class="grade-pagamentos-topo">
+        <div class="card-cartao cartao-c1">
+          <span class="badge-cartao">Principal</span>
+          <div class="cartao-topo">
+            <div class="cartao-chip"></div>
+            <div class="cartao-bandeira">
+              <svg width="36" viewBox="0 0 141.732 141.732" fill="white" opacity="0.8">
+                <path d="M62.935 89.571h-9.733l6.083-37.384h9.734zM45.014 52.187L35.735 77.9l-1.098-5.537-3.275-16.812s-.396-3.366-4.617-3.366H11.405l-.18.633s4.691.976 10.181 4.273l8.456 32.479h10.141l15.485-37.385H45.014zM121.569 89.571h8.937l-7.792-37.385h-7.824c-3.613 0-4.493 2.786-4.493 2.786L95.881 89.571h10.146l2.029-5.553h12.373l1.14 5.553zm-10.71-13.224l5.114-13.99 2.877 13.99h-7.991zM96.642 61.177l1.389-8.028s-4.286-1.63-8.754-1.63c-4.83 0-16.3 2.111-16.3 12.376 0 9.658 13.462 9.778 13.462 14.851s-12.075 4.164-16.06.965l-1.447 8.394s4.346 2.111 10.986 2.111c6.642 0 16.662-3.439 16.662-12.799 0-9.72-13.583-10.625-13.583-14.851.001-4.227 9.48-3.684 13.645-1.389z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="cartao-numero">•••• •••• •••• 4012</div>
+          <div class="cartao-info">
+            <div class="cartao-validade">
+              <small>VALIDADE</small>
+              <span>01/26</span>
+            </div>
+            <div class="cartao-tipo" style="color:rgba(255,255,255,0.7)">INTERNET</div>
+          </div>
+        </div>
+
+        <div class="card-cartao cartao-c2">
+          <div class="cartao-topo">
+            <div class="cartao-chip"></div>
+            <div class="cartao-bandeira">
+              <svg width="36" viewBox="0 0 2001 1237" fill="white" opacity="0.7">
+                <path d="M1270.57 1104.15H729.71V132.15H1270.58L1270.57 1104.15Z"/>
+                <path d="M764 618.17C764 421 856.32 245.36 1000.08 132.17C891.261 46.36 756.669-.2 618.09 0 276.72 0 0 276.76 0 618.17c0 341.41 276.72 618.17 618.09 618.17 138.582.21 273.178-46.36 382.01-132.17C856.34 991 764 815.35 764 618.17z"/>
+                <path d="M2000.25 618.17c0 341.41-276.72 618.17-618.09 618.17-138.6.2-273.21-46.37-382.05-132.17C1143.91 990.98 1236.23 815.35 1236.23 618.17c0-197.18-92.32-372.81-236.12-485.99C1108.95 46.37 1243.56-.2 1382.15 0c341.37 0 618.09 276.76 618.09 618.17"/>
+              </svg>
+            </div>
+          </div>
+          <div class="cartao-numero">•••• •••• •••• 2228</div>
+          <div class="cartao-info">
+            <div class="cartao-validade">
+              <small>VALIDADE</small>
+              <span>12/27</span>
+            </div>
+            <div class="cartao-tipo" style="color:rgba(255,255,255,0.7)">UNIVERSAL</div>
+          </div>
+        </div>
+
+        <div class="card-cartao cartao-c3">
+          <div class="cartao-topo">
+            <div class="cartao-chip"></div>
+            <div class="cartao-bandeira">
+              <svg width="36" viewBox="0 0 141.732 141.732" fill="white" opacity="0.7">
+                <path d="M62.935 89.571h-9.733l6.083-37.384h9.734zM45.014 52.187L35.735 77.9l-1.098-5.537-3.275-16.812s-.396-3.366-4.617-3.366H11.405l-.18.633s4.691.976 10.181 4.273l8.456 32.479h10.141l15.485-37.385H45.014z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="cartao-numero">•••• •••• •••• 5214</div>
+          <div class="cartao-info">
+            <div class="cartao-validade">
+              <small>VALIDADE</small>
+              <span>03/26</span>
+            </div>
+            <div class="cartao-tipo" style="color:rgba(255,255,255,0.7)">OURO</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Novo pagamento + histórico -->
+    <div class="grade-pag-inferior">
+      <div class="card animar">
+        <div class="card-titulo">Novo pagamento</div>
+        <div class="card-sub">Preencha os dados abaixo</div>
+        <div class="form-pagamento">
+          <div class="campo-form">
+            <label>Beneficiário</label>
+            <input type="text" placeholder="Nome ou razão social">
+          </div>
+          <div class="grade-campos">
+            <div class="campo-form">
+              <label>Conta</label>
+              <input type="text" placeholder="000000-0">
+            </div>
+            <div class="campo-form">
+              <label>Agência</label>
+              <input type="text" placeholder="0000">
+            </div>
+          </div>
+          <div class="grade-campos">
+            <div class="campo-form">
+              <label>Valor</label>
+              <input type="text" placeholder="R$ 0,00">
+            </div>
+            <div class="campo-form">
+              <label>Cartão de origem</label>
+              <select>
+                <option>•••• 4012 — Internet</option>
+                <option>•••• 2228 — Universal</option>
+                <option>•••• 5214 — Ouro</option>
+              </select>
+            </div>
+          </div>
+          <div class="campo-form">
+            <label>Descrição (opcional)</label>
+            <input type="text" placeholder="Ex: Aluguel, conta de luz...">
+          </div>
+          <button class="btn-pagar">Realizar pagamento</button>
+        </div>
+      </div>
+
+      <div class="card animar">
+        <div class="header-secao">
+          <h3>Histórico recente</h3>
+          <button class="btn-icon" style="width:30px;height:30px">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+        <div class="lista-transacoes">
+          <div class="transacao-item">
+            <div class="transacao-logo"><img src="https://assets.codepen.io/285131/apple.svg" alt="Apple"></div>
+            <div class="transacao-info">
+              <div class="transacao-nome">Apple Inc.</div>
+              <div class="transacao-desc">•••• 4012 · <span class="badge-data">28 out. 21</span></div>
+            </div>
+            <div class="transacao-valor neg">- R$ 550</div>
+          </div>
+          <div class="separador"></div>
+          <div class="transacao-item">
+            <div class="transacao-logo"><img src="https://assets.codepen.io/285131/pinterest.svg" alt="Pinterest"></div>
+            <div class="transacao-info">
+              <div class="transacao-nome">Pinterest</div>
+              <div class="transacao-desc">•••• 5214 · <span class="badge-data">26 out. 21</span></div>
+            </div>
+            <div class="transacao-valor neg">- R$ 120</div>
+          </div>
+          <div class="separador"></div>
+          <div class="transacao-item">
+            <div class="transacao-logo"><img src="https://assets.codepen.io/285131/warner-bros.svg" alt="Warner Bros"></div>
+            <div class="transacao-info">
+              <div class="transacao-nome">Warner Bros.</div>
+              <div class="transacao-desc">•••• 2228 · <span class="badge-data">22 out. 21</span></div>
+            </div>
+            <div class="transacao-valor neg">- R$ 70</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ═══════════════════════════════════
+       ABA: PIX
+  ════════════════════════════════════ -->
+  <main class="conteudo" id="pix">
+
+    <div class="saudacao animar">
+      <div>
+        <h2 style="font-family:var(--font-display);font-size:22px;font-weight:700">Pix</h2>
+        <p style="font-size:13px;color:var(--ts);margin-top:2px">Transferências instantâneas 24h</p>
+      </div>
+    </div>
+
+    <div class="grade-metricas">
+      <div class="card-metrica verde animar">
+        <div class="metrica-label"><span class="dot" style="background:var(--verde)"></span>Enviado este mês</div>
+        <div class="metrica-valor">R$ 1.850,00</div>
+        <div class="metrica-var neg">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          3 transferências
+        </div>
+      </div>
+      <div class="card-metrica lilas animar">
+        <div class="metrica-label"><span class="dot" style="background:var(--lilas)"></span>Recebido este mês</div>
+        <div class="metrica-valor">R$ 4.200,00</div>
+        <div class="metrica-var pos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+          5 transferências
+        </div>
+      </div>
+      <div class="card-metrica ambar animar">
+        <div class="metrica-label"><span class="dot" style="background:var(--ambar)"></span>Agendados</div>
+        <div class="metrica-valor">R$ 620,00</div>
+        <div class="metrica-var" style="color:var(--ambar)">
+          2 pendentes
+        </div>
+      </div>
+      <div class="card-metrica rosa animar">
+        <div class="metrica-label"><span class="dot" style="background:var(--rosa)"></span>Devolucões</div>
+        <div class="metrica-valor">R$ 0,00</div>
+        <div class="metrica-var pos">Nenhuma pendente</div>
+      </div>
+    </div>
+
+    <div class="grade-pag-inferior">
+      <!-- Enviar Pix -->
+      <div class="card animar">
+        <div class="card-titulo">Enviar Pix</div>
+        <div class="card-sub">Instantâneo, 24 horas por dia</div>
+        <div class="form-pagamento">
+          <div class="campo-form">
+            <label>Tipo de chave</label>
+            <select>
+              <option>CPF / CNPJ</option>
+              <option>E-mail</option>
+              <option>Telefone</option>
+              <option>Chave aleatória</option>
+            </select>
+          </div>
+          <div class="campo-form">
+            <label>Chave Pix</label>
+            <input type="text" placeholder="Digite a chave do destinatário">
+          </div>
+          <div class="grade-campos">
+            <div class="campo-form">
+              <label>Valor</label>
+              <input type="text" placeholder="R$ 0,00">
+            </div>
+            <div class="campo-form">
+              <label>Data</label>
+              <input type="date" style="color-scheme:dark">
+            </div>
+          </div>
+          <div class="campo-form">
+            <label>Mensagem (opcional)</label>
+            <input type="text" placeholder="Ex: Aluguel de abril...">
+          </div>
+          <button class="btn-pagar">Enviar Pix agora</button>
+        </div>
+      </div>
+
+      <!-- Histórico Pix -->
+      <div class="card animar">
+        <div class="header-secao">
+          <h3>Histórico Pix</h3>
+          <div class="filtros">
+            <button class="btn-icon" style="width:30px;height:30px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="lista-transacoes">
+          <div class="transacao-item">
+            <div class="transacao-logo-icon" style="background:#003020">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#00f5a8" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+            </div>
+            <div class="transacao-info">
+              <div class="transacao-nome">João Silva</div>
+              <div class="transacao-desc">CPF: •••.456.•••-89 · <span class="badge-data">08 abr. 26</span></div>
+            </div>
+            <div class="transacao-valor pos">+ R$ 2.000,00</div>
+          </div>
+          <div class="separador"></div>
+          <div class="transacao-item">
+            <div class="transacao-logo-icon" style="background:#2a0030">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#f472b6" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+            </div>
+            <div class="transacao-info">
+              <div class="transacao-nome">Maria Fernanda</div>
+              <div class="transacao-desc">Telefone: (51) •••••-4532 · <span class="badge-data">05 abr. 26</span></div>
+            </div>
+            <div class="transacao-valor neg">- R$ 350,00</div>
+          </div>
+          <div class="separador"></div>
+          <div class="transacao-item">
+            <div class="transacao-logo-icon" style="background:#1a0060">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#c4b5fd" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+            </div>
+            <div class="transacao-info">
+              <div class="transacao-nome">Empresa XYZ LTDA</div>
+              <div class="transacao-desc">CNPJ: 00.000.•••/0001-00 · <span class="badge-data">01 abr. 26</span></div>
+            </div>
+            <div class="transacao-valor pos">+ R$ 2.200,00</div>
+          </div>
+          <div class="separador"></div>
+          <div class="transacao-item">
+            <div class="transacao-logo-icon" style="background:#3a2000">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="transacao-info">
+              <div class="transacao-nome">Carlos Eduardo</div>
+              <div class="transacao-desc">Agendado · <span class="badge-data">12 abr. 26</span></div>
+            </div>
+            <div class="transacao-valor" style="color:var(--ambar)">R$ 500,00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Minhas chaves -->
+    <div class="card animar">
+      <div class="card-titulo">Minhas chaves Pix</div>
+      <div class="card-sub">Gerencie suas chaves cadastradas</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--c600);border-radius:var(--r-lg);border:1px solid var(--borda)">
+          <div style="width:38px;height:38px;border-radius:var(--r-md);background:var(--lilas-dim);display:flex;align-items:center;justify-content:center">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--lilas)" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:11px;color:var(--ts)">E-mail</div>
+            <div style="font-size:13px;font-weight:500;color:var(--tp)">matheus@almeria.com.br</div>
+          </div>
+          <button class="btn-copiar">Copiar</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--c600);border-radius:var(--r-lg);border:1px solid var(--borda)">
+          <div style="width:38px;height:38px;border-radius:var(--r-md);background:var(--verde-dim);display:flex;align-items:center;justify-content:center">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--verde)" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.61 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:11px;color:var(--ts)">Telefone</div>
+            <div style="font-size:13px;font-weight:500;color:var(--tp)">(54) 99999-8877</div>
+          </div>
+          <button class="btn-copiar" style="background:var(--verde);color:#003020">Copiar</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;padding:14px;background:var(--c600);border-radius:var(--r-lg);border:1px solid var(--borda)">
+          <div style="width:38px;height:38px;border-radius:var(--r-md);background:var(--ambar-dim);display:flex;align-items:center;justify-content:center">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:11px;color:var(--ts)">Chave aleatória</div>
+            <div style="font-size:13px;font-weight:500;color:var(--tp)">a1b2c3d4-e5f6-7890-abcd-ef1234567890</div>
+          </div>
+          <button class="btn-copiar" style="background:var(--ambar);color:#3a2000">Copiar</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ═══ BARRA LATERAL DIREITA ═══ -->
+  <aside class="lateral">
+    <div class="lateral-titulo">Novo Pagamento</div>
+
+    <div>
+      <p style="font-size:12px;color:var(--ts);margin-bottom:10px">Escolha um cartão</p>
+      <div class="cartoes-mini">
+        <div class="cartao-mini-item selecionado">
+          <div class="cartao-mini-vis verde"><span>01/26</span><span>•••• 4012</span></div>
+          <div class="cartao-mini-dados">
+            <h4>Internet</h4>
+            <p>Visa · Principal</p>
+          </div>
+          <div class="cartao-mini-saldo">R$ 2.110</div>
+        </div>
+        <div class="cartao-mini-item">
+          <div class="cartao-mini-vis lilas"><span>12/27</span><span>•••• 2228</span></div>
+          <div class="cartao-mini-dados">
+            <h4>Universal</h4>
+            <p>Mastercard</p>
+          </div>
+          <div class="cartao-mini-saldo">R$ 5.621</div>
+        </div>
+        <div class="cartao-mini-item">
+          <div class="cartao-mini-vis escuro"><span>03/26</span><span>•••• 5214</span></div>
+          <div class="cartao-mini-dados">
+            <h4>Ouro</h4>
+            <p>Visa Gold</p>
+          </div>
+          <div class="cartao-mini-saldo">R$ 3.473</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pix rápido -->
+    <div>
+      <p style="font-size:12px;color:var(--ts);margin-bottom:10px">Pix rápido</p>
+      <div class="chave-pix">
+        <div class="chave-pix-info">
+          <small>Sua chave Pix</small>
+          <span>matheus@almeria.com.br</span>
+        </div>
+        <button class="btn-copiar" onclick="copiarChave(this)">Copiar</button>
+      </div>
+      <div class="grade-pix" style="margin-top:10px">
+        <div class="btn-pix">
+          <div class="btn-pix-icon" style="background:var(--verde-dim)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--verde)" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+          </div>
+          <span>Enviar</span>
+        </div>
+        <div class="btn-pix">
+          <div class="btn-pix-icon" style="background:var(--lilas-dim)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--lilas)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+          </div>
+          <span>Receber</span>
+        </div>
+        <div class="btn-pix">
+          <div class="btn-pix-icon" style="background:var(--ambar-dim)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          </div>
+          <span>QR Code</span>
+        </div>
+        <div class="btn-pix">
+          <div class="btn-pix-icon" style="background:var(--rosa-dim)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--rosa)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <span>Agendar</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-lateral">
+      <p>Perguntas frequentes</p>
+      <div class="campo-faq">
+        <label>Pergunta</label>
+        <input type="text" placeholder="Digite aqui...">
+      </div>
+    </div>
+
+    <div class="rodape-lateral">
+      <button class="btn-salvar">Salvar</button>
+      <button class="btn-config">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        Configurações
+      </button>
+    </div>
+  </aside>
+
+</div>
+
+<script>
+function trocarAba(id, btn) {
+  document.querySelectorAll('.conteudo').forEach(el => el.classList.remove('ativo'));
+  document.querySelectorAll('.aba').forEach(el => el.classList.remove('ativo'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('ativo'));
+  const conteudo = document.getElementById(id);
+  if (conteudo) conteudo.classList.add('ativo');
+  if (btn) btn.classList.add('ativo');
+  const navMap = { painel: 0, pagamentos: 1, pix: 2 };
+  const navItems = document.querySelectorAll('.nav-item');
+  if (navMap[id] !== undefined && navItems[navMap[id]]) {
+    navItems[navMap[id]].classList.add('ativo');
+  }
+}
+
+function trocarNav(id, btn) {
+  document.querySelectorAll('.conteudo').forEach(el => el.classList.remove('ativo'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('ativo'));
+  document.querySelectorAll('.aba').forEach(el => el.classList.remove('ativo'));
+  const conteudo = document.getElementById(id);
+  if (conteudo) conteudo.classList.add('ativo');
+  if (btn) btn.classList.add('ativo');
+  const abaMap = { painel: 0, pagamentos: 1, pix: 2 };
+  const abas = document.querySelectorAll('.aba');
+  if (abaMap[id] !== undefined && abas[abaMap[id]]) {
+    abas[abaMap[id]].classList.add('ativo');
+  }
+}
+
+function copiarChave(btn) {
+  navigator.clipboard.writeText('matheus@almeria.com.br').catch(() => {});
+  const original = btn.textContent;
+  btn.textContent = 'Copiado!';
+  setTimeout(() => btn.textContent = original, 2000);
+}
+
+document.querySelectorAll('.cartao-mini-item').forEach(item => {
+  item.addEventListener('click', () => {
+    document.querySelectorAll('.cartao-mini-item').forEach(i => i.classList.remove('selecionado'));
+    item.classList.add('selecionado');
+  });
+});
+
+window.addEventListener('load', () => {
+  const tooltipDefaults = {
+    backgroundColor: '#1e1e2e',
+    borderColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    titleColor: '#eeeef8',
+    bodyColor: '#7070a0',
+    padding: 10,
+    cornerRadius: 8
+  };
+
+  new Chart(document.getElementById('grafico-cat'), {
+    type: 'bar',
+    data: {
+      labels: ['Moradia', 'Alimentação', 'Lazer', 'Transporte', 'Outros'],
+      datasets: [{
+        data: [1200, 820, 540, 380, 680],
+        backgroundColor: ['#8b5cf6', '#00f5a8', '#f472b6', '#fbbf24', '#60a5fa'],
+        borderRadius: 8,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...tooltipDefaults, callbacks: { label: ctx => ' R$ ' + ctx.raw.toLocaleString('pt-BR') } }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#7070a0', font: { size: 11, family: 'DM Sans' } },
+          grid: { display: false },
+          border: { display: false }
+        },
+        y: {
+          ticks: { color: '#7070a0', font: { size: 11, family: 'DM Sans' }, callback: v => 'R$' + (v/1000).toFixed(0) + 'k' },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          border: { display: false }
+        }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('grafico-evolucao'), {
+    type: 'line',
+    data: {
+      labels: ['Out', 'Nov', 'Dez', 'Jan', 'Fev', 'Mar', 'Abr'],
+      datasets: [{
+        data: [9200, 10100, 8800, 11200, 10400, 11600, 12847],
+        borderColor: '#8b5cf6',
+        backgroundColor: 'rgba(139,92,246,0.07)',
+        fill: true,
+        tension: 0.45,
+        pointBackgroundColor: '#8b5cf6',
+        pointBorderColor: '#1e1e2e',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...tooltipDefaults, callbacks: { label: ctx => ' R$ ' + ctx.raw.toLocaleString('pt-BR') } }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#7070a0', font: { size: 11, family: 'DM Sans' } },
+          grid: { display: false },
+          border: { display: false }
+        },
+        y: { display: false }
+      }
+    }
+  });
+});
+</script>
+
+</body>
+</html>

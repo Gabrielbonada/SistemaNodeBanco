@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Almeria NeoBank — Cartões</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --c900: #080810;
+  --c800: #0f0f1a;
+  --c700: #161622;
+  --c600: #1e1e2e;
+  --c500: #2a2a40;
+  --c400: #3d3d58;
+  --c300: #7070a0;
+  --c200: #a0a0c0;
+  --c100: #e8e8f5;
+  --verde: #00f5a8;
+  --verde-dim: rgba(0,245,168,0.12);
+  --lilas: #8b5cf6;
+  --lilas-dim: rgba(139,92,246,0.15);
+  --rosa: #f472b6;
+  --rosa-dim: rgba(244,114,182,0.12);
+  --ambar: #fbbf24;
+  --ambar-dim: rgba(251,191,36,0.12);
+  --azul: #60a5fa;
+  --azul-dim: rgba(96,165,250,0.12);
+  --tp: #eeeef8;
+  --ts: #7070a0;
+  --tt: #3d3d58;
+  --borda: rgba(255,255,255,0.06);
+  --borda-hover: rgba(255,255,255,0.12);
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-full: 999px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--c900);
+  color: var(--tp);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button, select, input { font: inherit; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--c800); }
+::-webkit-scrollbar-thumb { background: var(--c500); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--c400); }
+
+/* ── LAYOUT ── */
+.app {
+  display: grid;
+  grid-template-rows: 64px 1fr;
+  grid-template-columns: 200px 1fr 360px;
+  grid-template-areas:
+    "cabecalho cabecalho cabecalho"
+    "nav       conteudo  lateral";
+  min-height: 100vh;
+}
+
+/* ── CABEÇALHO ── */
+.cabecalho {
+  grid-area: cabecalho;
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--borda);
+  background: var(--c800);
+  gap: 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  width: 172px;
+}
+
+.logo-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--lilas), var(--verde));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logo-icon svg { width: 18px; height: 18px; }
+.logo-texto { display: flex; flex-direction: column; line-height: 1.1; }
+.logo-texto strong { font-family: var(--font-display); font-size: 15px; font-weight: 700; }
+.logo-texto small { font-size: 10px; color: var(--ts); letter-spacing: 0.05em; }
+
+.abas-cabecalho { display: flex; gap: 2px; flex: 1; }
+
+.aba {
+  padding: 7px 16px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ts);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+  white-space: nowrap;
+}
+
+.aba:hover { color: var(--tp); background: var(--c600); }
+.aba.ativo { color: var(--tp); background: var(--c600); position: relative; }
+.aba.ativo::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: var(--lilas);
+  border-radius: 99px;
+}
+
+.acoes-header { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+.btn-perfil {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--c600); border: 1px solid var(--borda-hover);
+  border-radius: var(--r-full); padding: 6px 14px 6px 8px;
+  cursor: pointer; transition: all 0.2s; color: var(--tp);
+  font-size: 13px; font-weight: 500;
+}
+.btn-perfil:hover { background: var(--c500); }
+
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--lilas), var(--rosa));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: white; flex-shrink: 0;
+}
+
+.btn-icon {
+  width: 36px; height: 36px; border-radius: var(--r-sm);
+  border: 1px solid var(--borda); background: transparent; color: var(--ts);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s; position: relative;
+}
+.btn-icon:hover { background: var(--c600); color: var(--tp); border-color: var(--borda-hover); }
+.notif-dot { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px; background: var(--rosa); border-radius: 50%; border: 1.5px solid var(--c800); }
+
+/* ── NAV ── */
+.nav-lateral {
+  grid-area: nav;
+  padding: 24px 14px;
+  border-right: 1px solid var(--borda);
+  background: var(--c800);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: var(--r-md);
+  font-size: 13px; font-weight: 500; color: var(--ts);
+  cursor: pointer; transition: all 0.2s; border: none;
+  background: transparent; width: 100%; text-align: left;
+}
+.nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-item:hover { background: var(--c700); color: var(--tp); }
+.nav-item.ativo { background: var(--lilas-dim); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.2); }
+.nav-item.ativo svg { color: var(--lilas); }
+
+.nav-section-label {
+  font-size: 10px; font-weight: 600; color: var(--tt);
+  letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 12px 4px; margin-top: 4px;
+}
+
+.nav-rodape { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--borda); }
+.nav-rodape p { font-size: 11px; color: var(--tt); line-height: 1.6; }
+
+/* ── CONTEÚDO ── */
+.conteudo {
+  grid-area: conteudo;
+  padding: 28px;
+  overflow-y: auto;
+  height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ── LATERAL ── */
+.lateral {
+  grid-area: lateral;
+  padding: 24px;
+  border-left: 1px solid var(--borda);
+  background: var(--c800);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+/* ── CARDS GENÉRICOS ── */
+.card {
+  background: var(--c700);
+  border: 1px solid var(--borda);
+  border-radius: var(--r-xl);
+  padding: 20px;
+}
+
+.card-titulo { font-family: var(--font-display); font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.card-sub { font-size: 12px; color: var(--ts); margin-bottom: 16px; }
+.separador { height: 1px; background: var(--borda); margin: 6px 0; }
+
+/* ── CARTÕES FÍSICOS ── */
+.cartoes-carrossel {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+}
+
+.cartao-fisico {
+  min-width: 300px;
+  height: 180px;
+  border-radius: 20px;
+  padding: 22px 24px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 2px solid transparent;
+}
+
+.cartao-fisico:hover { transform: translateY(-4px) scale(1.01); }
+
+.cartao-fisico.ativo-cartao {
+  border-color: rgba(139,92,246,0.5);
+  box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
+}
+
+.cartao-1 { background: linear-gradient(135deg, #1a0050 0%, #2d0080 50%, #3d10a0 100%); }
+.cartao-2 { background: linear-gradient(135deg, #001a40 0%, #003080 50%, #0050c0 100%); }
+.cartao-3 { background: linear-gradient(135deg, #1a1a00 0%, #3a3a00 50%, #5a4a00 100%); }
+
+.cartao-decoracao {
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.cartao-decoracao::after {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.cartao-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  position: relative;
+  z-index: 1;
+}
+
+.cartao-chip {
+  width: 30px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--ambar), #f59e0b);
+  border-radius: 5px;
+  opacity: 0.85;
+}
+
+.cartao-bandeira-svg { opacity: 0.85; }
+
+.cartao-numero {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  letter-spacing: 0.18em;
+  position: relative;
+  z-index: 1;
+}
+
+.cartao-rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  position: relative;
+  z-index: 1;
+}
+
+.cartao-titular small { font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; }
+.cartao-titular span { display: block; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); margin-top: 2px; }
+
+.cartao-dados-dir { text-align: right; }
+.cartao-dados-dir small { font-size: 9px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; }
+.cartao-dados-dir span { display: block; font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.9); margin-top: 2px; }
+
+.cartao-tipo-badge {
+  position: absolute;
+  bottom: 22px;
+  right: 24px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.6);
+}
+
+/* ── ADICIONAR CARTÃO ── */
+.btn-add-cartao {
+  min-width: 300px;
+  height: 180px;
+  border-radius: 20px;
+  border: 2px dashed var(--c500);
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.25s;
+  color: var(--ts);
+  font-family: var(--font-body);
+  flex-shrink: 0;
+}
+
+.btn-add-cartao:hover {
+  border-color: var(--lilas);
+  color: #c4b5fd;
+  background: var(--lilas-dim);
+}
+
+.btn-add-cartao svg { width: 28px; height: 28px; }
+.btn-add-cartao span { font-size: 13px; font-weight: 500; }
+
+/* ── MÉTRICAS DO CARTÃO ── */
+.grade-metricas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.card-metrica {
+  background: var(--c700);
+  border: 1px solid var(--borda);
+  border-radius: var(--r-xl);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s;
+}
+
+.card-metrica:hover { border-color: var(--borda-hover); transform: translateY(-2px); }
+.card-metrica::before { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; border-radius: 0 0 var(--r-xl) var(--r-xl); }
+.card-metrica.verde::before { background: var(--verde); }
+.card-metrica.lilas::before { background: var(--lilas); }
+.card-metrica.ambar::before { background: var(--ambar); }
+.card-metrica.rosa::before { background: var(--rosa); }
+
+.metrica-label { font-size: 12px; color: var(--ts); font-weight: 500; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.metrica-label .dot { width: 6px; height: 6px; border-radius: 50%; }
+.metrica-valor { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--tp); line-height: 1.2; margin-bottom: 6px; }
+.metrica-var { display: flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 500; }
+.metrica-var.pos { color: var(--verde); }
+.metrica-var.neg { color: var(--rosa); }
+.metrica-var svg { width: 11px; height: 11px; }
+
+/* ── BARRA DE LIMITE ── */
+.barra-limite { margin-top: 10px; }
+.barra-limite-info { display: flex; justify-content: space-between; font-size: 11px; color: var(--ts); margin-bottom: 6px; }
+.trilho { height: 5px; background: var(--c500); border-radius: 99px; overflow: hidden; }
+.trilho-fill { height: 100%; border-radius: 99px; background: var(--ambar); transition: width 1s ease; }
+
+/* ── TRANSAÇÕES ── */
+.header-secao {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-bottom: 14px; border-bottom: 1px solid var(--borda); margin-bottom: 4px;
+}
+.header-secao h3 { font-family: var(--font-display); font-size: 15px; font-weight: 600; }
+
+.filtros-linha { display: flex; gap: 6px; }
+
+.chip-filtro {
+  padding: 5px 12px;
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--borda);
+  background: transparent;
+  color: var(--ts);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.chip-filtro:hover { border-color: var(--borda-hover); color: var(--tp); }
+.chip-filtro.ativo { background: var(--lilas-dim); border-color: rgba(139,92,246,0.3); color: #c4b5fd; }
+
+.lista-transacoes { display: flex; flex-direction: column; gap: 2px; }
+
+.transacao-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 10px; border-radius: var(--r-md);
+  transition: background 0.2s; cursor: pointer;
+}
+.transacao-item:hover { background: var(--c600); }
+
+.transacao-logo {
+  width: 42px; height: 42px; border-radius: var(--r-md);
+  background: var(--c100); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.transacao-logo img { width: 55%; }
+
+.transacao-logo-icon {
+  width: 42px; height: 42px; border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.transacao-logo-icon svg { width: 18px; height: 18px; }
+
+.transacao-info { flex: 1; min-width: 0; }
+.transacao-nome { font-size: 13px; font-weight: 500; }
+.transacao-desc { font-size: 11px; color: var(--ts); margin-top: 2px; }
+
+.transacao-valor { font-size: 14px; font-weight: 600; white-space: nowrap; }
+.pos { color: var(--verde); }
+.neg { color: var(--rosa); }
+
+.badge-data {
+  display: inline-flex; align-items: center; background: var(--c500);
+  border-radius: 99px; padding: 2px 8px; font-size: 10px; color: var(--ts);
+}
+
+.badge-categoria {
+  display: inline-flex; align-items: center;
+  border-radius: 99px; padding: 2px 8px; font-size: 10px; margin-top: 3px;
+}
+
+/* ── AÇÕES DO CARTÃO ── */
+.acoes-cartao {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.acao-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: var(--c600);
+  border: 1px solid var(--borda);
+  border-radius: var(--r-lg);
+  padding: 16px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--tp);
+  font-family: var(--font-body);
+}
+.acao-btn:hover { background: var(--c500); border-color: var(--borda-hover); transform: translateY(-2px); }
+
+.acao-icon {
+  width: 40px; height: 40px; border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: center;
+}
+.acao-icon svg { width: 18px; height: 18px; }
+.acao-btn span { font-size: 12px; font-weight: 500; color: var(--ts); }
+
+/* ── LATERAL ── */
+.lateral-titulo { font-family: var(--font-display); font-size: 16px; font-weight: 700; }
+
+.info-cartao-selecionado {
+  background: var(--c700);
+  border: 1px solid var(--borda);
+  border-radius: var(--r-xl);
+  padding: 20px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--borda);
+}
+.info-row:last-child { border-bottom: none; }
+.info-row dt { font-size: 12px; color: var(--ts); }
+.info-row dd { font-size: 13px; font-weight: 500; }
+
+.toggle-switch {
+  position: relative;
+  width: 42px;
+  height: 24px;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; inset: 0;
+  background: var(--c500);
+  border-radius: 99px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px; height: 18px;
+  left: 3px; bottom: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--verde); }
+.toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+.btn-bloquear {
+  width: 100%;
+  background: var(--rosa-dim);
+  border: 1px solid rgba(244,114,182,0.2);
+  color: var(--rosa);
+  border-radius: var(--r-md);
+  padding: 11px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-body);
+}
+.btn-bloquear:hover { background: rgba(244,114,182,0.2); }
+
+.btn-solicitar {
+  width: 100%;
+  background: linear-gradient(135deg, var(--lilas), #a855f7);
+  color: white;
+  border: none;
+  border-radius: var(--r-md);
+  padding: 11px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-display);
+}
+.btn-solicitar:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* ── GRAFICO GASTOS ── */
+.grafico-wrap { position: relative; width: 100%; }
+
+/* ── ANIMAÇÕES ── */
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.animar { animation: fadeInUp 0.4s ease both; }
+.animar:nth-child(1) { animation-delay: 0.05s; }
+.animar:nth-child(2) { animation-delay: 0.1s; }
+.animar:nth-child(3) { animation-delay: 0.15s; }
+.animar:nth-child(4) { animation-delay: 0.2s; }
+.animar:nth-child(5) { animation-delay: 0.25s; }
+
+/* ── RESPONSIVO ── */
+@media (max-width: 1100px) {
+  .app { grid-template-columns: 180px 1fr; grid-template-areas: "cabecalho cabecalho" "nav conteudo"; }
+  .lateral { display: none; }
+  .grade-metricas { grid-template-columns: 1fr 1fr; }
+  .acoes-cartao { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
+  .app { grid-template-columns: 1fr; grid-template-areas: "cabecalho" "conteudo"; }
+  .nav-lateral { display: none; }
+  .grade-metricas { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- CABEÇALHO -->
+  <header class="cabecalho">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="logo-texto">
+        <strong>Almeria</strong><small>NeoBank</small>
+      </div>
+    </div>
+
+    <nav class="abas-cabecalho">
+      <button class="aba" onclick="window.location='index.html'">Visão Geral</button>
+      <button class="aba" onclick="window.location='index.html'">Pagamentos</button>
+      <button class="aba" onclick="window.location='index.html'">Pix</button>
+      <button class="aba ativo">Cartões</button>
+      <button class="aba" onclick="window.location='conta.html'">Conta</button>
+      <button class="aba">Negócios</button>
+    </nav>
+
+    <div class="acoes-header">
+      <button class="btn-perfil" onclick="window.location='conta.html'">
+        <div class="avatar">MP</div>
+        <span>Matheus Peterson</span>
+      </button>
+      <button class="btn-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </button>
+      <button class="btn-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- NAV LATERAL -->
+  <nav class="nav-lateral">
+    <span class="nav-section-label">Menu</span>
+    <button class="nav-item" onclick="window.location='index.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Painel
+    </button>
+    <button class="nav-item" onclick="window.location='index.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Pagamentos
+    </button>
+    <button class="nav-item" onclick="window.location='index.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
+      Pix
+    </button>
+    <button class="nav-item ativo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><path d="M5 15h2M5 18h4"/></svg>
+      Cartões
+    </button>
+    <button class="nav-item" onclick="window.location='conta.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Conta
+    </button>
+    <button class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Agendados
+    </button>
+    <span class="nav-section-label">Mercado</span>
+    <button class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      SWIFT
+    </button>
+    <button class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      Câmbio
+    </button>
+    <div class="nav-rodape"><p>Almeria NeoBank ©<br>Todos os direitos<br>reservados 2025</p></div>
+  </nav>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="conteudo">
+
+    <!-- TÍTULO -->
+    <div class="animar" style="display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <h2 style="font-family:var(--font-display);font-size:22px;font-weight:700">Meus Cartões</h2>
+        <p style="font-size:13px;color:var(--ts);margin-top:2px">Gerencie todos os seus cartões em um só lugar</p>
+      </div>
+      <button class="btn-solicitar" style="width:auto;padding:10px 20px" onclick="abrirModalSolicitar()">
+        + Solicitar novo cartão
+      </button>
+    </div>
+
+    <!-- CARROSSEL DE CARTÕES -->
+    <div class="cartoes-carrossel animar" id="carrossel">
+      <!-- Cartão 1 -->
+      <div class="cartao-fisico cartao-1 ativo-cartao" onclick="selecionarCartao(0, this)" data-index="0">
+        <div class="cartao-decoracao"></div>
+        <div class="cartao-topo">
+          <div class="cartao-chip"></div>
+          <div class="cartao-bandeira-svg">
+            <svg width="38" viewBox="0 0 141.732 141.732" fill="white">
+              <path d="M62.935 89.571h-9.733l6.083-37.384h9.734zM45.014 52.187L35.735 77.9l-1.098-5.537-3.275-16.812s-.396-3.366-4.617-3.366H11.405l-.18.633s4.691.976 10.181 4.273l8.456 32.479h10.141l15.485-37.385H45.014zM121.569 89.571h8.937l-7.792-37.385h-7.824c-3.613 0-4.493 2.786-4.493 2.786L95.881 89.571h10.146l2.029-5.553h12.373l1.14 5.553zm-10.71-13.224l5.114-13.99 2.877 13.99h-7.991zM96.642 61.177l1.389-8.028s-4.286-1.63-8.754-1.63c-4.83 0-16.3 2.111-16.3 12.376 0 9.658 13.462 9.778 13.462 14.851s-12.075 4.164-16.06.965l-1.447 8.394s4.346 2.111 10.986 2.111c6.642 0 16.662-3.439 16.662-12.799 0-9.72-13.583-10.625-13.583-14.851.001-4.227 9.48-3.684 13.645-1.389z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="cartao-numero">•••• •••• •••• 4012</div>
+        <div class="cartao-rodape">
+          <div class="cartao-titular">
+            <small>Titular</small>
+            <span>Matheus Peterson</span>
+          </div>
+          <div class="cartao-dados-dir">
+            <small>Validade</small>
+            <span>01/26</span>
+          </div>
+        </div>
+        <div class="cartao-tipo-badge">INTERNET</div>
+      </div>
+
+      <!-- Cartão 2 -->
+      <div class="cartao-fisico cartao-2" onclick="selecionarCartao(1, this)" data-index="1">
+        <div class="cartao-decoracao"></div>
+        <div class="cartao-topo">
+          <div class="cartao-chip"></div>
+          <div class="cartao-bandeira-svg">
+            <svg width="38" viewBox="0 0 2001 1237" fill="white">
+              <path d="M1270.57 1104.15H729.71V132.15H1270.58L1270.57 1104.15Z"/>
+              <path d="M764 618.17C764 421 856.32 245.36 1000.08 132.17C891.261 46.36 756.669-.2 618.09 0 276.72 0 0 276.76 0 618.17c0 341.41 276.72 618.17 618.09 618.17 138.582.21 273.178-46.36 382.01-132.17C856.34 991 764 815.35 764 618.17z"/>
+              <path d="M2000.25 618.17c0 341.41-276.72 618.17-618.09 618.17-138.6.2-273.21-46.37-382.05-132.17C1143.91 990.98 1236.23 815.35 1236.23 618.17c0-197.18-92.32-372.81-236.12-485.99C1108.95 46.37 1243.56-.2 1382.15 0c341.37 0 618.09 276.76 618.09 618.17"/>
+            </svg>
+          </div>
+        </div>
+        <div class="cartao-numero">•••• •••• •••• 2228</div>
+        <div class="cartao-rodape">
+          <div class="cartao-titular">
+            <small>Titular</small>
+            <span>Matheus Peterson</span>
+          </div>
+          <div class="cartao-dados-dir">
+            <small>Validade</small>
+            <span>12/27</span>
+          </div>
+        </div>
+        <div class="cartao-tipo-badge">UNIVERSAL</div>
+      </div>
+
+      <!-- Cartão 3 -->
+      <div class="cartao-fisico cartao-3" onclick="selecionarCartao(2, this)" data-index="2">
+        <div class="cartao-decoracao"></div>
+        <div class="cartao-topo">
+          <div class="cartao-chip"></div>
+          <div class="cartao-bandeira-svg">
+            <svg width="38" viewBox="0 0 141.732 141.732" fill="white">
+              <path d="M62.935 89.571h-9.733l6.083-37.384h9.734zM45.014 52.187L35.735 77.9l-1.098-5.537-3.275-16.812s-.396-3.366-4.617-3.366H11.405l-.18.633s4.691.976 10.181 4.273l8.456 32.479h10.141l15.485-37.385H45.014z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="cartao-numero">•••• •••• •••• 5214</div>
+        <div class="cartao-rodape">
+          <div class="cartao-titular">
+            <small>Titular</small>
+            <span>Matheus Peterson</span>
+          </div>
+          <div class="cartao-dados-dir">
+            <small>Validade</small>
+            <span>03/26</span>
+          </div>
+        </div>
+        <div class="cartao-tipo-badge">OURO</div>
+      </div>
+
+      <!-- Adicionar -->
+      <button class="btn-add-cartao" onclick="abrirModalSolicitar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+        </svg>
+        <span>Adicionar cartão</span>
+      </button>
+    </div>
+
+    <!-- AÇÕES DO CARTÃO -->
+    <div class="acoes-cartao animar">
+      <button class="acao-btn">
+        <div class="acao-icon" style="background:var(--verde-dim)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--verde)" stroke-width="2"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+        </div>
+        <span>Pagar fatura</span>
+      </button>
+      <button class="acao-btn">
+        <div class="acao-icon" style="background:var(--lilas-dim)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--lilas)" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </div>
+        <span>Ver fatura</span>
+      </button>
+      <button class="acao-btn">
+        <div class="acao-icon" style="background:var(--ambar-dim)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <span>Aumentar limite</span>
+      </button>
+      <button class="acao-btn">
+        <div class="acao-icon" style="background:var(--rosa-dim)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--rosa)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <span>Bloqueio virtual</span>
+      </button>
+    </div>
+
+    <!-- MÉTRICAS -->
+    <div class="grade-metricas">
+      <div class="card-metrica ambar animar">
+        <div class="metrica-label"><span class="dot" style="background:var(--ambar)"></span>Limite disponível</div>
+        <div class="metrica-valor">R$ 3.620,00</div>
+        <div class="barra-limite">
+          <div class="barra-limite-info"><span>63,8% usado</span><span>Limite: R$ 10.000</span></div>
+          <div class="trilho"><div class="trilho-fill" id="barra-limite" style="width:63.8%"></div></div>
+        </div>
+      </div>
+      <div class="card-metrica rosa animar">
+        <div class="metrica-label"><span class="dot" style="background:var(--rosa)"></span>Fatura atual</div>
+        <div class="metrica-valor">R$ 2.840,00</div>
+        <div class="metrica-var" style="color:var(--ts)">Vence em 12 dias</div>
+      </div>
+      <div class="card-metrica verde animar">
+        <div class="metrica-label"><span class="dot" style="background:var(--verde)"></span>Cashback acumulado</div>
+        <div class="metrica-valor">R$ 124,50</div>
+        <div class="metrica-var pos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+          +R$ 18 este mês
+        </div>
+      </div>
+      <div class="card-metrica lilas animar">
+        <div class="metrica-label"><span class="dot" style="background:var(--lilas)"></span>Pontos acumulados</div>
+        <div class="metrica-valor">14.230 pts</div>
+        <div class="metrica-var pos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+          +840 este mês
+        </div>
+      </div>
+    </div>
+
+    <!-- GRÁFICO + TRANSAÇÕES -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="card animar">
+        <div class="card-titulo">Gastos por categoria</div>
+        <div class="card-sub">Abril 2026 — cartão •••• 4012</div>
+        <div class="grafico-wrap" style="height:200px">
+          <canvas id="grafico-cat-cartao"></canvas>
+        </div>
+      </div>
+      <div class="card animar">
+        <div class="card-titulo">Evolução da fatura</div>
+        <div class="card-sub">Últimos 6 meses</div>
+        <div class="grafico-wrap" style="height:200px; margin-top:8px">
+          <canvas id="grafico-fatura"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRANSAÇÕES RECENTES -->
+    <div class="card animar">
+      <div class="header-secao">
+        <h3>Transações recentes</h3>
+        <div class="filtros-linha">
+          <button class="chip-filtro ativo" onclick="filtrarTipo('todos', this)">Todas</button>
+          <button class="chip-filtro" onclick="filtrarTipo('debito', this)">Débito</button>
+          <button class="chip-filtro" onclick="filtrarTipo('credito', this)">Crédito</button>
+        </div>
+      </div>
+      <div class="lista-transacoes" id="lista-tx">
+        <div class="transacao-item" data-tipo="debito">
+          <div class="transacao-logo"><img src="https://assets.codepen.io/285131/apple.svg" alt="Apple"></div>
+          <div class="transacao-info">
+            <div class="transacao-nome">Apple Inc.</div>
+            <div class="transacao-desc">Apple ID Payment · <span class="badge-data">28 abr. 26</span></div>
+            <span class="badge-categoria" style="background:var(--lilas-dim);color:#c4b5fd">Tecnologia</span>
+          </div>
+          <div class="transacao-valor neg">- R$ 550,00</div>
+        </div>
+        <div class="separador"></div>
+        <div class="transacao-item" data-tipo="debito">
+          <div class="transacao-logo"><img src="https://assets.codepen.io/285131/pinterest.svg" alt="Pinterest"></div>
+          <div class="transacao-info">
+            <div class="transacao-nome">Pinterest</div>
+            <div class="transacao-desc">Assinatura 2 anos · <span class="badge-data">26 abr. 26</span></div>
+            <span class="badge-categoria" style="background:var(--rosa-dim);color:var(--rosa)">Entretenimento</span>
+          </div>
+          <div class="transacao-valor neg">- R$ 120,00</div>
+        </div>
+        <div class="separador"></div>
+        <div class="transacao-item" data-tipo="debito">
+          <div class="transacao-logo"><img src="https://assets.codepen.io/285131/warner-bros.svg" alt="Warner Bros"></div>
+          <div class="transacao-info">
+            <div class="transacao-nome">Warner Bros.</div>
+            <div class="transacao-desc">Cinema · <span class="badge-data">22 abr. 26</span></div>
+            <span class="badge-categoria" style="background:var(--ambar-dim);color:var(--ambar)">Lazer</span>
+          </div>
+          <div class="transacao-valor neg">- R$ 70,00</div>
+        </div>
+        <div class="separador"></div>
+        <div class="transacao-item" data-tipo="credito">
+          <div class="transacao-logo-icon" style="background:var(--verde-dim)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--verde)" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/></svg>
+          </div>
+          <div class="transacao-info">
+            <div class="transacao-nome">Estorno — Netflix</div>
+            <div class="transacao-desc">Crédito na fatura · <span class="badge-data">18 abr. 26</span></div>
+            <span class="badge-categoria" style="background:var(--verde-dim);color:var(--verde)">Estorno</span>
+          </div>
+          <div class="transacao-valor pos">+ R$ 45,90</div>
+        </div>
+        <div class="separador"></div>
+        <div class="transacao-item" data-tipo="debito">
+          <div class="transacao-logo-icon" style="background:var(--azul-dim)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--azul)" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </div>
+          <div class="transacao-info">
+            <div class="transacao-nome">Rappi</div>
+            <div class="transacao-desc">Delivery · <span class="badge-data">15 abr. 26</span></div>
+            <span class="badge-categoria" style="background:var(--ambar-dim);color:var(--ambar)">Alimentação</span>
+          </div>
+          <div class="transacao-valor neg">- R$ 87,40</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- LATERAL DIREITA -->
+  <aside class="lateral">
+    <div class="lateral-titulo">Cartão selecionado</div>
+
+    <div class="info-cartao-selecionado">
+      <dl>
+        <div class="info-row"><dt>Cartão</dt><dd id="lat-nome">Internet •••• 4012</dd></div>
+        <div class="info-row"><dt>Bandeira</dt><dd id="lat-bandeira">Visa</dd></div>
+        <div class="info-row"><dt>Validade</dt><dd id="lat-validade">01/26</dd></div>
+        <div class="info-row"><dt>Limite total</dt><dd>R$ 10.000,00</dd></div>
+        <div class="info-row"><dt>Limite usado</dt><dd id="lat-usado" style="color:var(--ambar)">63,8%</dd></div>
+        <div class="info-row">
+          <dt>Compras online</dt>
+          <dd>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </dd>
+        </div>
+        <div class="info-row">
+          <dt>Pagamento NFC</dt>
+          <dd>
+            <label class="toggle-switch">
+              <input type="checkbox" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </dd>
+        </div>
+        <div class="info-row">
+          <dt>Compras internacionais</dt>
+          <dd>
+            <label class="toggle-switch">
+              <input type="checkbox">
+              <span class="toggle-slider"></span>
+            </label>
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <button class="btn-bloquear">
+      🔒 Bloquear cartão temporariamente
+    </button>
+
+    <!-- FATURA -->
+    <div class="card" style="padding:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div>
+          <div style="font-size:12px;color:var(--ts)">Fatura a vencer</div>
+          <div style="font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--tp);margin-top:2px">R$ 2.840,00</div>
+        </div>
+        <span style="background:var(--ambar-dim);color:var(--ambar);border:1px solid rgba(251,191,36,0.2);border-radius:99px;padding:3px 10px;font-size:11px;font-weight:600">12 dias</span>
+      </div>
+      <div style="height:4px;background:var(--c500);border-radius:99px;overflow:hidden;margin-bottom:12px">
+        <div style="width:38%;height:100%;background:linear-gradient(90deg,var(--ambar),var(--verde));border-radius:99px"></div>
+      </div>
+      <button class="btn-solicitar" style="font-size:12px;padding:9px">Pagar fatura agora</button>
+    </div>
+
+    <div style="margin-top:auto">
+      <button class="btn-solicitar" onclick="abrirModalSolicitar()">+ Solicitar novo cartão</button>
+    </div>
+  </aside>
+
+</div>
+
+<!-- MODAL SOLICITAR CARTÃO -->
+<div id="modal" style="display:none;position:fixed;inset:0;background:rgba(8,8,16,0.85);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:var(--c800);border:1px solid var(--borda);border-radius:24px;padding:36px;width:460px;max-width:95vw;position:relative;animation:fadeUp 0.3s ease">
+    <button onclick="fecharModal()" style="position:absolute;top:16px;right:16px;background:var(--c600);border:none;color:var(--ts);border-radius:var(--r-sm);width:32px;height:32px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">✕</button>
+    <h2 style="font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:4px">Solicitar novo cartão</h2>
+    <p style="font-size:13px;color:var(--ts);margin-bottom:24px">Escolha o tipo de cartão ideal para você</p>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px" id="opcoes-cartao">
+      <div class="opcao-cartao" onclick="selecionarOpcao(this)" data-val="debito" style="padding:14px;background:var(--c700);border:1px solid var(--borda);border-radius:var(--r-lg);cursor:pointer;transition:all 0.2s">
+        <div style="font-size:13px;font-weight:600">Cartão de Débito</div>
+        <div style="font-size:12px;color:var(--ts);margin-top:2px">Usa o saldo da conta corrente em tempo real</div>
+      </div>
+      <div class="opcao-cartao" onclick="selecionarOpcao(this)" data-val="credito" style="padding:14px;background:var(--c700);border:1px solid var(--borda);border-radius:var(--r-lg);cursor:pointer;transition:all 0.2s">
+        <div style="font-size:13px;font-weight:600">Cartão de Crédito</div>
+        <div style="font-size:12px;color:var(--ts);margin-top:2px">Limite pré-aprovado com parcelamento em até 12x</div>
+      </div>
+      <div class="opcao-cartao" onclick="selecionarOpcao(this)" data-val="virtual" style="padding:14px;background:var(--c700);border:1px solid var(--borda);border-radius:var(--r-lg);cursor:pointer;transition:all 0.2s">
+        <div style="font-size:13px;font-weight:600">Cartão Virtual</div>
+        <div style="font-size:12px;color:var(--ts);margin-top:2px">Gerado na hora para compras online com segurança máxima</div>
+      </div>
+    </div>
+
+    <button class="btn-solicitar" onclick="confirmarSolicitar()">Continuar solicitação</button>
+  </div>
+</div>
+
+<style>
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+.opcao-cartao.selecionado { border-color:rgba(139,92,246,0.4) !important; background:var(--lilas-dim) !important; }
+</style>
+
+<script>
+const dadosCartoes = [
+  { nome: 'Internet •••• 4012', bandeira: 'Visa', validade: '01/26', usado: '63,8%' },
+  { nome: 'Universal •••• 2228', bandeira: 'Mastercard', validade: '12/27', usado: '28,2%' },
+  { nome: 'Ouro •••• 5214', bandeira: 'Visa Gold', validade: '03/26', usado: '34,7%' },
+];
+
+function selecionarCartao(idx, el) {
+  document.querySelectorAll('.cartao-fisico').forEach(c => c.classList.remove('ativo-cartao'));
+  el.classList.add('ativo-cartao');
+  const d = dadosCartoes[idx];
+  if (!d) return;
+  document.getElementById('lat-nome').textContent = d.nome;
+  document.getElementById('lat-bandeira').textContent = d.bandeira;
+  document.getElementById('lat-validade').textContent = d.validade;
+  document.getElementById('lat-usado').textContent = d.usado;
+  document.getElementById('barra-limite').style.width = d.usado;
+}
+
+function filtrarTipo(tipo, btn) {
+  document.querySelectorAll('.chip-filtro').forEach(c => c.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  document.querySelectorAll('.transacao-item').forEach(item => {
+    const sep = item.nextElementSibling;
+    if (tipo === 'todos' || item.dataset.tipo === tipo) {
+      item.style.display = '';
+      if (sep && sep.classList.contains('separador')) sep.style.display = '';
+    } else {
+      item.style.display = 'none';
+      if (sep && sep.classList.contains('separador')) sep.style.display = 'none';
+    }
+  });
+}
+
+function abrirModalSolicitar() {
+  const modal = document.getElementById('modal');
+  modal.style.display = 'flex';
+}
+
+function fecharModal() {
+  document.getElementById('modal').style.display = 'none';
+  document.querySelectorAll('.opcao-cartao').forEach(o => o.classList.remove('selecionado'));
+}
+
+function selecionarOpcao(el) {
+  document.querySelectorAll('.opcao-cartao').forEach(o => o.classList.remove('selecionado'));
+  el.classList.add('selecionado');
+}
+
+function confirmarSolicitar() {
+  const selecionado = document.querySelector('.opcao-cartao.selecionado');
+  if (!selecionado) { alert('Selecione um tipo de cartão.'); return; }
+  fecharModal();
+  // Em produção: redirecionar para fluxo de solicitação
+}
+
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal')) fecharModal();
+});
+
+// Gráficos
+window.addEventListener('load', () => {
+  const tooltipDefaults = {
+    backgroundColor: '#1e1e2e', borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1,
+    titleColor: '#eeeef8', bodyColor: '#7070a0', padding: 10, cornerRadius: 8
+  };
+
+  new Chart(document.getElementById('grafico-cat-cartao'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Tecnologia', 'Alimentação', 'Lazer', 'Transporte', 'Outros'],
+      datasets: [{
+        data: [820, 640, 480, 320, 580],
+        backgroundColor: ['#8b5cf6', '#00f5a8', '#f472b6', '#fbbf24', '#60a5fa'],
+        borderWidth: 0,
+        hoverOffset: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...tooltipDefaults, callbacks: { label: ctx => ' R$ ' + ctx.raw.toLocaleString('pt-BR') } }
+      }
+    }
+  });
+
+  new Chart(document.getElementById('grafico-fatura'), {
+    type: 'bar',
+    data: {
+      labels: ['Nov', 'Dez', 'Jan', 'Fev', 'Mar', 'Abr'],
+      datasets: [{
+        data: [2100, 3400, 1850, 2900, 2200, 2840],
+        backgroundColor: ['rgba(139,92,246,0.4)','rgba(139,92,246,0.4)','rgba(139,92,246,0.4)','rgba(139,92,246,0.4)','rgba(139,92,246,0.4)','rgba(139,92,246,0.85)'],
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { ...tooltipDefaults, callbacks: { label: ctx => ' R$ ' + ctx.raw.toLocaleString('pt-BR') } }
+      },
+      scales: {
+        x: { ticks: { color: '#7070a0', font: { size: 11 } }, grid: { display: false }, border: { display: false } },
+        y: { display: false }
+      }
+    }
+  });
+});
+</script>
+
+</body>
+</html>
