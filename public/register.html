@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro - Almeria</title>
+</head>
+<body>
+
+  <h2>Criar Conta</h2>
+
+<input type="text" id="nome" placeholder="Nome"><br><br> <input type="email" id="email" placeholder="Email"><br><br> <input type="password" id="senha" placeholder="Senha"><br><br>
+
+<button onclick="cadastrar()">Cadastrar</button>
+
+  <p>Já tem conta? <a href="login.html">Login</a></p>
+
+  <script>
+    async function cadastrar() {
+      const nome = document.getElementById("nome").value;
+      const email = document.getElementById("email").value;
+      const senha = document.getElementById("senha").value;
+
+      if (!nome || !email || !senha) {
+        alert("Preencha todos os campos!");
+        return;
+      }
+
+      const res = await fetch("http://localhost:3000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ nome, email, senha })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Conta criada com sucesso!");
+        window.location.href = "login.html";
+      } else {
+        alert(data.msg || "Erro ao cadastrar");
+      }
+    }
+  </script>
+
+</body>
+</html>
