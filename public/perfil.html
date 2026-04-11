@@ -1,1053 +1,732 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Almeria NeoBank — Conta</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --c900: #080810; --c800: #0f0f1a; --c700: #161622; --c600: #1e1e2e;
-  --c500: #2a2a40; --c400: #3d3d58; --c300: #7070a0; --c200: #a0a0c0; --c100: #e8e8f5;
-  --verde: #00f5a8; --verde-dim: rgba(0,245,168,0.12);
-  --lilas: #8b5cf6; --lilas-dim: rgba(139,92,246,0.15);
-  --rosa: #f472b6; --rosa-dim: rgba(244,114,182,0.12);
-  --ambar: #fbbf24; --ambar-dim: rgba(251,191,36,0.12);
-  --azul: #60a5fa; --azul-dim: rgba(96,165,250,0.12);
-  --tp: #eeeef8; --ts: #7070a0; --tt: #3d3d58;
-  --borda: rgba(255,255,255,0.06); --borda-hover: rgba(255,255,255,0.12);
-  --font-display: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
-  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-full: 999px;
-}
-
-html { scroll-behavior: smooth; }
-body { font-family: var(--font-body); background: var(--c900); color: var(--tp); min-height: 100vh; overflow-x: hidden; }
-img { display: block; max-width: 100%; }
-a { color: inherit; text-decoration: none; }
-button, select, input, textarea { font: inherit; }
-
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--c800); }
-::-webkit-scrollbar-thumb { background: var(--c500); border-radius: 99px; }
-
-/* ── LAYOUT ── */
-.app { display: grid; grid-template-rows: 64px 1fr; grid-template-columns: 200px 1fr 360px; grid-template-areas: "cabecalho cabecalho cabecalho" "nav conteudo lateral"; min-height: 100vh; }
-
-/* ── CABEÇALHO ── */
-.cabecalho { grid-area: cabecalho; display: flex; align-items: center; padding: 0 28px; border-bottom: 1px solid var(--borda); background: var(--c800); gap: 32px; position: sticky; top: 0; z-index: 100; }
-.logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; width: 172px; }
-.logo-icon { width: 34px; height: 34px; border-radius: var(--r-md); background: linear-gradient(135deg, var(--lilas), var(--verde)); display: flex; align-items: center; justify-content: center; }
-.logo-icon svg { width: 18px; height: 18px; }
-.logo-texto { display: flex; flex-direction: column; line-height: 1.1; }
-.logo-texto strong { font-family: var(--font-display); font-size: 15px; font-weight: 700; }
-.logo-texto small { font-size: 10px; color: var(--ts); letter-spacing: 0.05em; }
-.abas-cabecalho { display: flex; gap: 2px; flex: 1; }
-.aba { padding: 7px 16px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; color: var(--ts); cursor: pointer; transition: all 0.2s; border: none; background: transparent; white-space: nowrap; }
-.aba:hover { color: var(--tp); background: var(--c600); }
-.aba.ativo { color: var(--tp); background: var(--c600); position: relative; }
-.aba.ativo::after { content: ''; position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%); width: 20px; height: 2px; background: var(--lilas); border-radius: 99px; }
-.acoes-header { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.btn-perfil { display: flex; align-items: center; gap: 10px; background: var(--c600); border: 1px solid var(--borda-hover); border-radius: var(--r-full); padding: 6px 14px 6px 8px; cursor: pointer; transition: all 0.2s; color: var(--tp); font-size: 13px; font-weight: 500; }
-.btn-perfil:hover { background: var(--c500); }
-.avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, var(--lilas), var(--rosa)); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; flex-shrink: 0; }
-.btn-icon { width: 36px; height: 36px; border-radius: var(--r-sm); border: 1px solid var(--borda); background: transparent; color: var(--ts); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; position: relative; }
-.btn-icon:hover { background: var(--c600); color: var(--tp); border-color: var(--borda-hover); }
-.notif-dot { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px; background: var(--rosa); border-radius: 50%; border: 1.5px solid var(--c800); }
-
-/* ── NAV ── */
-.nav-lateral { grid-area: nav; padding: 24px 14px; border-right: 1px solid var(--borda); background: var(--c800); display: flex; flex-direction: column; gap: 4px; position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--r-md); font-size: 13px; font-weight: 500; color: var(--ts); cursor: pointer; transition: all 0.2s; border: none; background: transparent; width: 100%; text-align: left; }
-.nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
-.nav-item:hover { background: var(--c700); color: var(--tp); }
-.nav-item.ativo { background: var(--lilas-dim); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.2); }
-.nav-section-label { font-size: 10px; font-weight: 600; color: var(--tt); letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 12px 4px; margin-top: 4px; }
-.nav-rodape { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--borda); }
-.nav-rodape p { font-size: 11px; color: var(--tt); line-height: 1.6; }
-
-/* ── CONTEÚDO ── */
-.conteudo { grid-area: conteudo; padding: 28px; overflow-y: auto; height: calc(100vh - 64px); display: flex; flex-direction: column; gap: 24px; }
-
-/* ── LATERAL ── */
-.lateral { grid-area: lateral; padding: 24px; border-left: 1px solid var(--borda); background: var(--c800); display: flex; flex-direction: column; gap: 20px; position: sticky; top: 64px; height: calc(100vh - 64px); overflow-y: auto; }
-
-/* ── CARD GENÉRICO ── */
-.card { background: var(--c700); border: 1px solid var(--borda); border-radius: var(--r-xl); padding: 20px; }
-.card-titulo { font-family: var(--font-display); font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-.card-sub { font-size: 12px; color: var(--ts); margin-bottom: 16px; }
-.separador { height: 1px; background: var(--borda); margin: 6px 0; }
-
-/* ── HERO DO PERFIL ── */
-.hero-perfil {
-  background: var(--c700);
-  border: 1px solid var(--borda);
-  border-radius: var(--r-xl);
-  padding: 28px;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-perfil::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; height: 4px;
-  background: linear-gradient(90deg, var(--lilas), var(--verde), var(--rosa));
-}
-
-.hero-glow {
-  position: absolute;
-  top: -60px; right: -60px;
-  width: 200px; height: 200px;
-  background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.perfil-topo {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  position: relative;
-  z-index: 1;
-}
-
-.avatar-grande {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--lilas), var(--rosa));
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-display); font-size: 22px; font-weight: 700; color: white;
-  flex-shrink: 0;
-  border: 3px solid var(--c700);
-  box-shadow: 0 0 0 2px var(--lilas);
-  position: relative;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-.avatar-grande:hover { transform: scale(1.05); }
-
-.avatar-editar {
-  position: absolute;
-  bottom: -2px; right: -2px;
-  width: 22px; height: 22px;
-  background: var(--lilas);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  border: 2px solid var(--c700);
-}
-.avatar-editar svg { width: 9px; height: 9px; }
-
-.perfil-info h2 { font-family: var(--font-display); font-size: 22px; font-weight: 700; }
-.perfil-info p { font-size: 13px; color: var(--ts); margin-top: 4px; }
-
-.perfil-badges {
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  flex-wrap: wrap;
-}
-
-.badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  border-radius: var(--r-full); padding: 3px 10px; font-size: 11px; font-weight: 600;
-}
-.badge-verde { background: var(--verde-dim); color: var(--verde); border: 1px solid rgba(0,245,168,0.2); }
-.badge-lilas { background: var(--lilas-dim); color: #c4b5fd; border: 1px solid rgba(139,92,246,0.2); }
-.badge-ambar { background: var(--ambar-dim); color: var(--ambar); border: 1px solid rgba(251,191,36,0.2); }
-.badge svg { width: 10px; height: 10px; }
-
-.perfil-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--borda);
-  border-radius: var(--r-lg);
-  overflow: hidden;
-  margin-top: 24px;
-  border: 1px solid var(--borda);
-}
-
-.stat-item {
-  background: var(--c700);
-  padding: 16px;
-  text-align: center;
-  transition: background 0.2s;
-}
-.stat-item:hover { background: var(--c600); }
-.stat-item small { font-size: 11px; color: var(--ts); display: block; }
-.stat-item strong { font-family: var(--font-display); font-size: 18px; font-weight: 700; display: block; margin-top: 4px; }
-
-/* ── TABS CONTA ── */
-.tabs-conta {
-  display: flex;
-  gap: 4px;
-  background: var(--c800);
-  border: 1px solid var(--borda);
-  border-radius: var(--r-lg);
-  padding: 4px;
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 9px;
-  border-radius: var(--r-md);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ts);
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.tab-btn:hover { color: var(--tp); background: var(--c700); }
-.tab-btn.ativo { background: var(--c700); color: var(--tp); border: 1px solid var(--borda); }
-
-.tab-painel { display: none; }
-.tab-painel.ativo { display: flex; flex-direction: column; gap: 20px; }
-
-/* ── FORMULÁRIO DE DADOS ── */
-.grade-campos-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-.campo {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.campo label { font-size: 12px; font-weight: 500; color: var(--ts); }
-
-.campo input,
-.campo select,
-.campo textarea {
-  background: var(--c600);
-  border: 1px solid var(--borda);
-  border-radius: var(--r-md);
-  padding: 10px 14px;
-  font-size: 13px;
-  color: var(--tp);
-  outline: none;
-  transition: all 0.2s;
-  resize: none;
-}
-
-.campo input:focus,
-.campo select:focus,
-.campo textarea:focus { border-color: var(--lilas); background: var(--c500); }
-.campo input[readonly] { opacity: 0.6; cursor: not-allowed; }
-.campo input::placeholder { color: var(--tt); }
-.campo select option { background: var(--c700); }
-
-/* ── BOTÕES ── */
-.btn-primario {
-  background: linear-gradient(135deg, var(--lilas), #a855f7);
-  color: white; border: none; border-radius: var(--r-md);
-  padding: 12px 24px; font-size: 14px; font-weight: 700;
-  cursor: pointer; transition: all 0.25s; font-family: var(--font-display);
-}
-.btn-primario:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,92,246,0.3); }
-
-.btn-secundario {
-  background: transparent; border: 1px solid var(--borda);
-  color: var(--ts); border-radius: var(--r-md); padding: 12px 24px;
-  font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: var(--font-body);
-}
-.btn-secundario:hover { border-color: var(--borda-hover); color: var(--tp); }
-
-.btn-perigo {
-  background: var(--rosa-dim); border: 1px solid rgba(244,114,182,0.2);
-  color: var(--rosa); border-radius: var(--r-md); padding: 12px 24px;
-  font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; font-family: var(--font-body);
-}
-.btn-perigo:hover { background: rgba(244,114,182,0.2); }
-
-.acoes-form { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
-
-/* ── SEGURANÇA ── */
-.lista-seguranca { display: flex; flex-direction: column; gap: 2px; }
-
-.seg-item {
-  display: flex; align-items: center; gap: 14px;
-  padding: 14px 12px; border-radius: var(--r-md); transition: background 0.2s;
-}
-.seg-item:hover { background: var(--c600); }
-
-.seg-icone {
-  width: 40px; height: 40px; border-radius: var(--r-md);
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.seg-icone svg { width: 18px; height: 18px; }
-
-.seg-info { flex: 1; }
-.seg-titulo { font-size: 13px; font-weight: 500; }
-.seg-sub { font-size: 11px; color: var(--ts); margin-top: 2px; }
-
-.toggle-switch { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
-.toggle-switch input { opacity: 0; width: 0; height: 0; }
-.toggle-slider { position: absolute; inset: 0; background: var(--c500); border-radius: 99px; cursor: pointer; transition: 0.3s; }
-.toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s; }
-.toggle-switch input:checked + .toggle-slider { background: var(--verde); }
-.toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
-
-/* ── NOTIFICAÇÕES ── */
-.notif-lista { display: flex; flex-direction: column; gap: 2px; }
-
-.notif-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 12px; border-radius: var(--r-md); transition: background 0.2s;
-}
-.notif-item:hover { background: var(--c600); }
-
-.notif-info small { font-size: 11px; color: var(--ts); }
-.notif-info span { display: block; font-size: 13px; font-weight: 500; margin-top: 2px; }
-
-/* ── PLANO ── */
-.plano-atual {
-  background: linear-gradient(135deg, #1a0060, #2d0090);
-  border: 1px solid rgba(139,92,246,0.25);
-  border-radius: var(--r-xl);
-  padding: 24px;
-  position: relative;
-  overflow: hidden;
-}
-
-.plano-glow {
-  position: absolute;
-  top: -40px; right: -40px;
-  width: 140px; height: 140px;
-  background: radial-gradient(circle, rgba(139,92,246,0.3) 0%, transparent 70%);
-  border-radius: 50%;
-}
-
-.plano-label { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.1em; }
-.plano-nome { font-family: var(--font-display); font-size: 24px; font-weight: 800; color: white; margin: 4px 0; }
-.plano-preco { font-size: 13px; color: rgba(255,255,255,0.6); }
-.plano-preco strong { color: rgba(255,255,255,0.9); font-size: 16px; }
-
-.plano-beneficios { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
-
-.beneficio-item {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 13px; color: rgba(255,255,255,0.75);
-}
-.beneficio-item svg { width: 14px; height: 14px; color: var(--verde); flex-shrink: 0; }
-
-.btn-upgrade {
-  margin-top: 18px;
-  background: white;
-  color: #2d0090;
-  border: none;
-  border-radius: var(--r-md);
-  padding: 11px 22px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-family: var(--font-display);
-}
-.btn-upgrade:hover { background: rgba(255,255,255,0.9); transform: translateY(-1px); }
-
-/* ── ATIVIDADE ── */
-.atividade-lista { display: flex; flex-direction: column; gap: 2px; }
-
-.atividade-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 10px 12px; border-radius: var(--r-md);
-  transition: background 0.2s; cursor: default;
-}
-.atividade-item:hover { background: var(--c600); }
-
-.ativ-icone {
-  width: 36px; height: 36px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.ativ-icone svg { width: 15px; height: 15px; }
-
-.ativ-info { flex: 1; }
-.ativ-titulo { font-size: 13px; font-weight: 500; }
-.ativ-data { font-size: 11px; color: var(--ts); margin-top: 1px; }
-
-.ativ-status {
-  font-size: 11px; font-weight: 600;
-  padding: 3px 8px; border-radius: var(--r-full);
-}
-
-/* ── LATERAL CONTA ── */
-.lateral-titulo { font-family: var(--font-display); font-size: 16px; font-weight: 700; }
-
-.score-anel {
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-}
-
-.score-anel canvas { max-width: 140px; }
-
-.score-numero {
-  text-align: center;
-}
-.score-numero strong {
-  font-family: var(--font-display); font-size: 32px; font-weight: 800; color: var(--verde);
-}
-.score-numero span { display: block; font-size: 12px; color: var(--ts); }
-
-.verificacoes { display: flex; flex-direction: column; gap: 8px; }
-
-.verif-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 10px; background: var(--c700);
-  border: 1px solid var(--borda); border-radius: var(--r-md);
-}
-
-.verif-icone {
-  width: 30px; height: 30px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.verif-icone svg { width: 13px; height: 13px; }
-
-.verif-info { flex: 1; }
-.verif-info small { font-size: 11px; color: var(--ts); }
-.verif-info span { display: block; font-size: 12px; font-weight: 500; }
-
-.verif-ok { background: var(--verde-dim); }
-.verif-ok svg { color: var(--verde); }
-.verif-pend { background: var(--ambar-dim); }
-.verif-pend svg { color: var(--ambar); }
-
-.btn-sair {
-  width: 100%; background: var(--rosa-dim); border: 1px solid rgba(244,114,182,0.2);
-  color: var(--rosa); border-radius: var(--r-md); padding: 11px;
-  font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  font-family: var(--font-body); margin-top: auto;
-}
-.btn-sair:hover { background: rgba(244,114,182,0.2); }
-.btn-sair svg { width: 14px; height: 14px; }
-
-/* ── TOAST ── */
-.toast {
-  position: fixed; bottom: 24px; right: 24px;
-  background: var(--c700); border: 1px solid var(--verde);
-  border-radius: var(--r-md); padding: 14px 18px;
-  display: flex; align-items: center; gap: 10px;
-  font-size: 13px; color: var(--tp); font-weight: 500;
-  z-index: 300; transform: translateY(80px); opacity: 0;
-  transition: all 0.35s ease; pointer-events: none;
-}
-.toast.visivel { transform: translateY(0); opacity: 1; }
-.toast svg { width: 16px; height: 16px; color: var(--verde); flex-shrink: 0; }
-
-/* ── ANIMAÇÕES ── */
-@keyframes fadeInUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-.animar { animation: fadeInUp 0.4s ease both; }
-.animar:nth-child(1) { animation-delay: 0.05s; }
-.animar:nth-child(2) { animation-delay: 0.1s; }
-.animar:nth-child(3) { animation-delay: 0.15s; }
-.animar:nth-child(4) { animation-delay: 0.2s; }
-.animar:nth-child(5) { animation-delay: 0.25s; }
-
-/* ── RESPONSIVO ── */
-@media (max-width: 1100px) { .app { grid-template-columns: 180px 1fr; grid-template-areas: "cabecalho cabecalho" "nav conteudo"; } .lateral { display: none; } .grade-campos-2 { grid-template-columns: 1fr; } }
-@media (max-width: 700px) { .app { grid-template-columns: 1fr; grid-template-areas: "cabecalho" "conteudo"; } .nav-lateral { display: none; } .perfil-stats { grid-template-columns: 1fr; } }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Almeria NeoBank — Conta</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="./css/perfil.css">
 </head>
+
 <body>
 
-<div class="app">
+  <div class="app">
 
-  <!-- CABEÇALHO -->
-  <header class="cabecalho">
-    <div class="logo">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+    <!-- CABEÇALHO -->
+    <header class="cabecalho">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg>
+        </div>
+        <div class="logo-texto"><strong>Almeria</strong><small>NeoBank</small></div>
+      </div>
+      <nav class="abas-cabecalho">
+        <button class="aba" onclick="window.location='index.html'">Visão Geral</button>
+        <button class="aba" onclick="window.location='index.html'">Pagamentos</button>
+        <button class="aba" onclick="window.location='index.html'">Pix</button>
+        <button class="aba" onclick="window.location='cartoes.html'">Cartões</button>
+        <button class="aba ativo">Conta</button>
+        <button class="aba">Negócios</button>
+      </nav>
+      <div class="acoes-header">
+        <button class="btn-perfil">
+          <div class="avatar">MP</div>
+          <span>Matheus Peterson</span>
+        </button>
+        <button class="btn-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+        </button>
+        <button class="btn-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <span class="notif-dot"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- NAV -->
+    <nav class="nav-lateral">
+      <span class="nav-section-label">Menu</span>
+      <button class="nav-item" onclick="window.location='index.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <rect x="14" y="14" width="7" height="7" rx="1" />
         </svg>
+        Painel
+      </button>
+      <button class="nav-item" onclick="window.location='index.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2" />
+          <line x1="1" y1="10" x2="23" y2="10" />
+        </svg>
+        Pagamentos
+      </button>
+      <button class="nav-item" onclick="window.location='index.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4" />
+        </svg>
+        Pix
+      </button>
+      <button class="nav-item" onclick="window.location='cartoes.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2" />
+          <line x1="1" y1="10" x2="23" y2="10" />
+          <path d="M5 15h2" />
+        </svg>
+        Cartões
+      </button>
+      <button class="nav-item ativo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+        Conta
+      </button>
+      <button class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+        Agendados
+      </button>
+      <span class="nav-section-label">Mercado</span>
+      <button class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="2" y1="12" x2="22" y2="12" />
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+        </svg>
+        SWIFT
+      </button>
+      <button class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+          <polyline points="17 6 23 6 23 12" />
+        </svg>
+        Câmbio
+      </button>
+      <div class="nav-rodape">
+        <p>Almeria NeoBank ©<br>Todos os direitos<br>reservados 2025</p>
       </div>
-      <div class="logo-texto"><strong>Almeria</strong><small>NeoBank</small></div>
-    </div>
-    <nav class="abas-cabecalho">
-      <button class="aba" onclick="window.location='index.html'">Visão Geral</button>
-      <button class="aba" onclick="window.location='index.html'">Pagamentos</button>
-      <button class="aba" onclick="window.location='index.html'">Pix</button>
-      <button class="aba" onclick="window.location='cartoes.html'">Cartões</button>
-      <button class="aba ativo">Conta</button>
-      <button class="aba">Negócios</button>
     </nav>
-    <div class="acoes-header">
-      <button class="btn-perfil">
-        <div class="avatar">MP</div>
-        <span>Matheus Peterson</span>
-      </button>
-      <button class="btn-icon">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      </button>
-      <button class="btn-icon">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="notif-dot"></span>
-      </button>
-    </div>
-  </header>
 
-  <!-- NAV -->
-  <nav class="nav-lateral">
-    <span class="nav-section-label">Menu</span>
-    <button class="nav-item" onclick="window.location='index.html'">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Painel
-    </button>
-    <button class="nav-item" onclick="window.location='index.html'">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-      Pagamentos
-    </button>
-    <button class="nav-item" onclick="window.location='index.html'">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
-      Pix
-    </button>
-    <button class="nav-item" onclick="window.location='cartoes.html'">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><path d="M5 15h2"/></svg>
-      Cartões
-    </button>
-    <button class="nav-item ativo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      Conta
-    </button>
-    <button class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-      Agendados
-    </button>
-    <span class="nav-section-label">Mercado</span>
-    <button class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-      SWIFT
-    </button>
-    <button class="nav-item">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-      Câmbio
-    </button>
-    <div class="nav-rodape"><p>Almeria NeoBank ©<br>Todos os direitos<br>reservados 2025</p></div>
-  </nav>
+    <!-- CONTEÚDO -->
+    <main class="conteudo">
 
-  <!-- CONTEÚDO -->
-  <main class="conteudo">
-
-    <!-- HERO -->
-    <div class="hero-perfil animar">
-      <div class="hero-glow"></div>
-      <div class="perfil-topo">
-        <div class="avatar-grande">
-          MP
-          <div class="avatar-editar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </div>
-        </div>
-        <div class="perfil-info">
-          <h2>Matheus Peterson</h2>
-          <p>matheus@almeria.com.br · (54) 99999-8877</p>
-          <div class="perfil-badges">
-            <span class="badge badge-verde">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              Verificado
-            </span>
-            <span class="badge badge-lilas">Plano Pro</span>
-            <span class="badge badge-ambar">Membro desde 2023</span>
-          </div>
-        </div>
-      </div>
-      <div class="perfil-stats">
-        <div class="stat-item">
-          <small>Transações no mês</small>
-          <strong>47</strong>
-        </div>
-        <div class="stat-item">
-          <small>Conta corrente</small>
-          <strong>0001 · 12.847-5</strong>
-        </div>
-        <div class="stat-item">
-          <small>Score de crédito</small>
-          <strong style="color:var(--verde)">812</strong>
-        </div>
-      </div>
-    </div>
-
-    <!-- TABS -->
-    <div class="tabs-conta animar">
-      <button class="tab-btn ativo" onclick="mudarTab('dados', this)">Dados pessoais</button>
-      <button class="tab-btn" onclick="mudarTab('seguranca', this)">Segurança</button>
-      <button class="tab-btn" onclick="mudarTab('notificacoes', this)">Notificações</button>
-      <button class="tab-btn" onclick="mudarTab('plano', this)">Plano</button>
-      <button class="tab-btn" onclick="mudarTab('atividade', this)">Atividade</button>
-    </div>
-
-    <!-- TAB: DADOS PESSOAIS -->
-    <div class="tab-painel ativo" id="tab-dados">
-      <div class="card animar">
-        <div class="card-titulo">Informações pessoais</div>
-        <div class="card-sub">Mantenha seus dados sempre atualizados</div>
-        <div style="display:flex;flex-direction:column;gap:14px">
-          <div class="grade-campos-2">
-            <div class="campo">
-              <label>Nome completo</label>
-              <input type="text" value="Matheus Peterson">
-            </div>
-            <div class="campo">
-              <label>Nome social (opcional)</label>
-              <input type="text" placeholder="Como prefere ser chamado">
+      <!-- HERO -->
+      <div class="hero-perfil animar">
+        <div class="hero-glow"></div>
+        <div class="perfil-topo">
+          <div class="avatar-grande">
+            MP
+            <div class="avatar-editar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
             </div>
           </div>
-          <div class="grade-campos-2">
-            <div class="campo">
-              <label>CPF</label>
-              <input type="text" value="•••.456.•••-89" readonly>
-            </div>
-            <div class="campo">
-              <label>Data de nascimento</label>
-              <input type="date" value="1995-07-14" style="color-scheme:dark">
-            </div>
-          </div>
-          <div class="grade-campos-2">
-            <div class="campo">
-              <label>E-mail</label>
-              <input type="email" value="matheus@almeria.com.br">
-            </div>
-            <div class="campo">
-              <label>Telefone</label>
-              <input type="tel" value="(54) 99999-8877">
+          <div class="perfil-info">
+            <h2>Matheus Peterson</h2>
+            <p>matheus@almeria.com.br · (54) 99999-8877</p>
+            <div class="perfil-badges">
+              <span class="badge badge-verde">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                Verificado
+              </span>
+              <span class="badge badge-lilas">Plano Pro</span>
+              <span class="badge badge-ambar">Membro desde 2023</span>
             </div>
           </div>
-          <div class="acoes-form">
-            <button class="btn-secundario">Cancelar</button>
-            <button class="btn-primario" onclick="salvar()">Salvar alterações</button>
+        </div>
+        <div class="perfil-stats">
+          <div class="stat-item">
+            <small>Transações no mês</small>
+            <strong>47</strong>
+          </div>
+          <div class="stat-item">
+            <small>Conta corrente</small>
+            <strong>0001 · 12.847-5</strong>
+          </div>
+          <div class="stat-item">
+            <small>Score de crédito</small>
+            <strong style="color:var(--verde)">812</strong>
           </div>
         </div>
       </div>
 
-      <div class="card animar">
-        <div class="card-titulo">Endereço</div>
-        <div class="card-sub">Utilizado para envio de correspondências</div>
-        <div style="display:flex;flex-direction:column;gap:14px">
-          <div class="grade-campos-2">
-            <div class="campo">
-              <label>CEP</label>
-              <input type="text" value="95020-370">
+      <!-- TABS -->
+      <div class="tabs-conta animar">
+        <button class="tab-btn ativo" onclick="mudarTab('dados', this)">Dados pessoais</button>
+        <button class="tab-btn" onclick="mudarTab('seguranca', this)">Segurança</button>
+        <button class="tab-btn" onclick="mudarTab('notificacoes', this)">Notificações</button>
+        <button class="tab-btn" onclick="mudarTab('plano', this)">Plano</button>
+        <button class="tab-btn" onclick="mudarTab('atividade', this)">Atividade</button>
+      </div>
+
+      <!-- TAB: DADOS PESSOAIS -->
+      <div class="tab-painel ativo" id="tab-dados">
+        <div class="card animar">
+          <div class="card-titulo">Informações pessoais</div>
+          <div class="card-sub">Mantenha seus dados sempre atualizados</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="grade-campos-2">
+              <div class="campo">
+                <label>Nome completo</label>
+                <input type="text" value="Matheus Peterson">
+              </div>
+              <div class="campo">
+                <label>Nome social (opcional)</label>
+                <input type="text" placeholder="Como prefere ser chamado">
+              </div>
             </div>
-            <div class="campo">
-              <label>Estado</label>
-              <select><option selected>Rio Grande do Sul</option><option>São Paulo</option><option>Rio de Janeiro</option></select>
+            <div class="grade-campos-2">
+              <div class="campo">
+                <label>CPF</label>
+                <input type="text" value="•••.456.•••-89" readonly>
+              </div>
+              <div class="campo">
+                <label>Data de nascimento</label>
+                <input type="date" value="1995-07-14" style="color-scheme:dark">
+              </div>
+            </div>
+            <div class="grade-campos-2">
+              <div class="campo">
+                <label>E-mail</label>
+                <input type="email" value="matheus@almeria.com.br">
+              </div>
+              <div class="campo">
+                <label>Telefone</label>
+                <input type="tel" value="(54) 99999-8877">
+              </div>
+            </div>
+            <div class="acoes-form">
+              <button class="btn-secundario">Cancelar</button>
+              <button class="btn-primario" onclick="salvar()">Salvar alterações</button>
             </div>
           </div>
-          <div class="grade-campos-2">
-            <div class="campo">
-              <label>Cidade</label>
-              <input type="text" value="Caxias do Sul">
+        </div>
+
+        <div class="card animar">
+          <div class="card-titulo">Endereço</div>
+          <div class="card-sub">Utilizado para envio de correspondências</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="grade-campos-2">
+              <div class="campo">
+                <label>CEP</label>
+                <input type="text" value="95020-370">
+              </div>
+              <div class="campo">
+                <label>Estado</label>
+                <select>
+                  <option selected>Rio Grande do Sul</option>
+                  <option>São Paulo</option>
+                  <option>Rio de Janeiro</option>
+                </select>
+              </div>
             </div>
-            <div class="campo">
-              <label>Bairro</label>
-              <input type="text" value="Centro">
+            <div class="grade-campos-2">
+              <div class="campo">
+                <label>Cidade</label>
+                <input type="text" value="Caxias do Sul">
+              </div>
+              <div class="campo">
+                <label>Bairro</label>
+                <input type="text" value="Centro">
+              </div>
             </div>
-          </div>
-          <div class="grade-campos-2">
-            <div class="campo" style="grid-column:1/-1">
-              <label>Logradouro</label>
-              <input type="text" value="Rua Sinimbu, 1234 — Apto 301">
+            <div class="grade-campos-2">
+              <div class="campo" style="grid-column:1/-1">
+                <label>Logradouro</label>
+                <input type="text" value="Rua Sinimbu, 1234 — Apto 301">
+              </div>
             </div>
-          </div>
-          <div class="acoes-form">
-            <button class="btn-secundario">Cancelar</button>
-            <button class="btn-primario" onclick="salvar()">Salvar endereço</button>
+            <div class="acoes-form">
+              <button class="btn-secundario">Cancelar</button>
+              <button class="btn-primario" onclick="salvar()">Salvar endereço</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- TAB: SEGURANÇA -->
-    <div class="tab-painel" id="tab-seguranca">
-      <div class="card animar">
-        <div class="card-titulo">Alterar senha</div>
-        <div class="card-sub">Use uma senha forte com pelo menos 8 caracteres</div>
-        <div style="display:flex;flex-direction:column;gap:14px">
-          <div class="campo">
-            <label>Senha atual</label>
-            <input type="password" placeholder="••••••••">
-          </div>
-          <div class="grade-campos-2">
+      <!-- TAB: SEGURANÇA -->
+      <div class="tab-painel" id="tab-seguranca">
+        <div class="card animar">
+          <div class="card-titulo">Alterar senha</div>
+          <div class="card-sub">Use uma senha forte com pelo menos 8 caracteres</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
             <div class="campo">
-              <label>Nova senha</label>
+              <label>Senha atual</label>
               <input type="password" placeholder="••••••••">
             </div>
-            <div class="campo">
-              <label>Confirmar nova senha</label>
-              <input type="password" placeholder="••••••••">
+            <div class="grade-campos-2">
+              <div class="campo">
+                <label>Nova senha</label>
+                <input type="password" placeholder="••••••••">
+              </div>
+              <div class="campo">
+                <label>Confirmar nova senha</label>
+                <input type="password" placeholder="••••••••">
+              </div>
+            </div>
+            <div class="acoes-form">
+              <button class="btn-primario" onclick="salvar('Senha alterada com sucesso!')">Alterar senha</button>
             </div>
           </div>
-          <div class="acoes-form">
-            <button class="btn-primario" onclick="salvar('Senha alterada com sucesso!')">Alterar senha</button>
+        </div>
+
+        <div class="card animar">
+          <div class="card-titulo">Configurações de segurança</div>
+          <div class="card-sub">Controle o acesso à sua conta</div>
+          <div class="lista-seguranca">
+            <div class="seg-item">
+              <div class="seg-icone" style="background:var(--verde-dim)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--verde)" stroke-width="2">
+                  <rect x="5" y="11" width="14" height="10" rx="2" />
+                  <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                </svg>
+              </div>
+              <div class="seg-info">
+                <div class="seg-titulo">Autenticação em dois fatores</div>
+                <div class="seg-sub">Ativo via aplicativo autenticador</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="separador"></div>
+            <div class="seg-item">
+              <div class="seg-icone" style="background:var(--lilas-dim)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--lilas)" stroke-width="2">
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.61 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+                </svg>
+              </div>
+              <div class="seg-info">
+                <div class="seg-titulo">Confirmação por SMS</div>
+                <div class="seg-sub">Código enviado para (54) ••••• -8877</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="separador"></div>
+            <div class="seg-item">
+              <div class="seg-icone" style="background:var(--ambar-dim)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
+                </svg>
+              </div>
+              <div class="seg-info">
+                <div class="seg-titulo">Alerta de login por e-mail</div>
+                <div class="seg-sub">Notificação a cada novo acesso</div>
+              </div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="separador"></div>
+            <div class="seg-item">
+              <div class="seg-icone" style="background:var(--azul-dim)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--azul)" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <line x1="8" y1="21" x2="16" y2="21" />
+                  <line x1="12" y1="17" x2="12" y2="21" />
+                </svg>
+              </div>
+              <div class="seg-info">
+                <div class="seg-titulo">Dispositivos confiáveis</div>
+                <div class="seg-sub">3 dispositivos cadastrados</div>
+              </div>
+              <button class="btn-secundario" style="padding:6px 14px;font-size:12px">Gerenciar</button>
+            </div>
+            <div class="separador"></div>
+            <div class="seg-item">
+              <div class="seg-icone" style="background:var(--rosa-dim)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--rosa)" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+              </div>
+              <div class="seg-info">
+                <div class="seg-titulo">Encerrar todas as sessões</div>
+                <div class="seg-sub">Desconectar de todos os dispositivos</div>
+              </div>
+              <button class="btn-perigo" style="padding:6px 14px;font-size:12px">Encerrar</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="card animar">
-        <div class="card-titulo">Configurações de segurança</div>
-        <div class="card-sub">Controle o acesso à sua conta</div>
-        <div class="lista-seguranca">
-          <div class="seg-item">
-            <div class="seg-icone" style="background:var(--verde-dim)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--verde)" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      <!-- TAB: NOTIFICAÇÕES -->
+      <div class="tab-painel" id="tab-notificacoes">
+        <div class="card animar">
+          <div class="card-titulo">Preferências de notificação</div>
+          <div class="card-sub">Escolha o que deseja ser notificado</div>
+          <div class="notif-lista">
+            <div class="notif-item">
+              <div class="notif-info"><small>Transações</small><span>Toda movimentação na conta</span></div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
             </div>
-            <div class="seg-info">
-              <div class="seg-titulo">Autenticação em dois fatores</div>
-              <div class="seg-sub">Ativo via aplicativo autenticador</div>
+            <div class="separador"></div>
+            <div class="notif-item">
+              <div class="notif-info"><small>Pix</small><span>Envios e recebimentos via Pix</span></div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
             </div>
-            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="separador"></div>
-          <div class="seg-item">
-            <div class="seg-icone" style="background:var(--lilas-dim)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--lilas)" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.61 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <div class="separador"></div>
+            <div class="notif-item">
+              <div class="notif-info"><small>Fatura do cartão</small><span>Vencimento e pagamento da fatura</span></div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
             </div>
-            <div class="seg-info">
-              <div class="seg-titulo">Confirmação por SMS</div>
-              <div class="seg-sub">Código enviado para (54) ••••• -8877</div>
+            <div class="separador"></div>
+            <div class="notif-item">
+              <div class="notif-info"><small>Investimentos</small><span>Rentabilidade e vencimentos</span></div>
+              <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
             </div>
-            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="separador"></div>
-          <div class="seg-item">
-            <div class="seg-icone" style="background:var(--ambar-dim)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <div class="separador"></div>
+            <div class="notif-item">
+              <div class="notif-info"><small>Promoções</small><span>Ofertas e novidades do Almeria</span></div>
+              <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
             </div>
-            <div class="seg-info">
-              <div class="seg-titulo">Alerta de login por e-mail</div>
-              <div class="seg-sub">Notificação a cada novo acesso</div>
+            <div class="separador"></div>
+            <div class="notif-item">
+              <div class="notif-info"><small>Segurança</small><span>Tentativas de acesso suspeitas</span></div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
             </div>
-            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="separador"></div>
-          <div class="seg-item">
-            <div class="seg-icone" style="background:var(--azul-dim)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--azul)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            </div>
-            <div class="seg-info">
-              <div class="seg-titulo">Dispositivos confiáveis</div>
-              <div class="seg-sub">3 dispositivos cadastrados</div>
-            </div>
-            <button class="btn-secundario" style="padding:6px 14px;font-size:12px">Gerenciar</button>
-          </div>
-          <div class="separador"></div>
-          <div class="seg-item">
-            <div class="seg-icone" style="background:var(--rosa-dim)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--rosa)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            </div>
-            <div class="seg-info">
-              <div class="seg-titulo">Encerrar todas as sessões</div>
-              <div class="seg-sub">Desconectar de todos os dispositivos</div>
-            </div>
-            <button class="btn-perigo" style="padding:6px 14px;font-size:12px">Encerrar</button>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- TAB: NOTIFICAÇÕES -->
-    <div class="tab-painel" id="tab-notificacoes">
-      <div class="card animar">
-        <div class="card-titulo">Preferências de notificação</div>
-        <div class="card-sub">Escolha o que deseja ser notificado</div>
-        <div class="notif-lista">
-          <div class="notif-item">
-            <div class="notif-info"><small>Transações</small><span>Toda movimentação na conta</span></div>
-            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="separador"></div>
-          <div class="notif-item">
-            <div class="notif-info"><small>Pix</small><span>Envios e recebimentos via Pix</span></div>
-            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="separador"></div>
-          <div class="notif-item">
-            <div class="notif-info"><small>Fatura do cartão</small><span>Vencimento e pagamento da fatura</span></div>
-            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="separador"></div>
-          <div class="notif-item">
-            <div class="notif-info"><small>Investimentos</small><span>Rentabilidade e vencimentos</span></div>
-            <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
-          </div>
-          <div class="separador"></div>
-          <div class="notif-item">
-            <div class="notif-info"><small>Promoções</small><span>Ofertas e novidades do Almeria</span></div>
-            <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
-          </div>
-          <div class="separador"></div>
-          <div class="notif-item">
-            <div class="notif-info"><small>Segurança</small><span>Tentativas de acesso suspeitas</span></div>
-            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+        <div class="card animar">
+          <div class="card-titulo">Canal de notificação</div>
+          <div class="card-sub">Por onde deseja receber os alertas</div>
+          <div class="notif-lista">
+            <div class="notif-item">
+              <div class="notif-info"><small>Push (app)</small><span>Notificações push no celular</span></div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="separador"></div>
+            <div class="notif-item">
+              <div class="notif-info"><small>E-mail</small><span>Receber por e-mail</span></div>
+              <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="separador"></div>
+            <div class="notif-item">
+              <div class="notif-info"><small>SMS</small><span>Mensagem de texto no celular</span></div>
+              <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="card animar">
-        <div class="card-titulo">Canal de notificação</div>
-        <div class="card-sub">Por onde deseja receber os alertas</div>
-        <div class="notif-lista">
-          <div class="notif-item">
-            <div class="notif-info"><small>Push (app)</small><span>Notificações push no celular</span></div>
-            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+      <!-- TAB: PLANO -->
+      <div class="tab-painel" id="tab-plano">
+        <div class="plano-atual animar">
+          <div class="plano-glow"></div>
+          <div class="plano-label">Seu plano atual</div>
+          <div class="plano-nome">Almeria Pro ✦</div>
+          <div class="plano-preco"><strong>R$ 29,90</strong>/mês</div>
+          <div class="plano-beneficios">
+            <div class="beneficio-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>Pix ilimitado sem taxa</div>
+            <div class="beneficio-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>Cartão virtual ilimitado</div>
+            <div class="beneficio-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>Cashback de 1,5% em todas as compras</div>
+            <div class="beneficio-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>Acesso a investimentos exclusivos</div>
+            <div class="beneficio-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>Suporte prioritário 24h</div>
           </div>
-          <div class="separador"></div>
-          <div class="notif-item">
-            <div class="notif-info"><small>E-mail</small><span>Receber por e-mail</span></div>
-            <label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="separador"></div>
-          <div class="notif-item">
-            <div class="notif-info"><small>SMS</small><span>Mensagem de texto no celular</span></div>
-            <label class="toggle-switch"><input type="checkbox"><span class="toggle-slider"></span></label>
-          </div>
+          <button class="btn-upgrade">Fazer upgrade para Ultra →</button>
         </div>
-      </div>
-    </div>
 
-    <!-- TAB: PLANO -->
-    <div class="tab-painel" id="tab-plano">
-      <div class="plano-atual animar">
-        <div class="plano-glow"></div>
-        <div class="plano-label">Seu plano atual</div>
-        <div class="plano-nome">Almeria Pro ✦</div>
-        <div class="plano-preco"><strong>R$ 29,90</strong>/mês</div>
-        <div class="plano-beneficios">
-          <div class="beneficio-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Pix ilimitado sem taxa</div>
-          <div class="beneficio-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Cartão virtual ilimitado</div>
-          <div class="beneficio-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Cashback de 1,5% em todas as compras</div>
-          <div class="beneficio-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Acesso a investimentos exclusivos</div>
-          <div class="beneficio-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Suporte prioritário 24h</div>
-        </div>
-        <button class="btn-upgrade">Fazer upgrade para Ultra →</button>
-      </div>
-
-      <div class="card animar">
-        <div class="card-titulo">Comparativo de planos</div>
-        <div class="card-sub">Escolha o melhor para sua vida financeira</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px">
-          <div style="padding:16px;background:var(--c600);border-radius:var(--r-lg);border:1px solid var(--borda)">
-            <div style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:4px">Gratuito</div>
-            <div style="font-size:13px;color:var(--ts);margin-bottom:12px">R$ 0/mês</div>
-            <div style="font-size:12px;color:var(--ts);display:flex;flex-direction:column;gap:6px">
-              <span>✓ Conta corrente</span>
-              <span>✓ Pix (5/mês)</span>
-              <span>✗ Cartão físico</span>
-              <span>✗ Cashback</span>
+        <div class="card animar">
+          <div class="card-titulo">Comparativo de planos</div>
+          <div class="card-sub">Escolha o melhor para sua vida financeira</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px">
+            <div style="padding:16px;background:var(--c600);border-radius:var(--r-lg);border:1px solid var(--borda)">
+              <div style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:4px">Gratuito
+              </div>
+              <div style="font-size:13px;color:var(--ts);margin-bottom:12px">R$ 0/mês</div>
+              <div style="font-size:12px;color:var(--ts);display:flex;flex-direction:column;gap:6px">
+                <span>✓ Conta corrente</span>
+                <span>✓ Pix (5/mês)</span>
+                <span>✗ Cartão físico</span>
+                <span>✗ Cashback</span>
+              </div>
             </div>
-          </div>
-          <div style="padding:16px;background:var(--lilas-dim);border-radius:var(--r-lg);border:1px solid rgba(139,92,246,0.3)">
-            <div style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:4px">Pro <span style="color:var(--lilas)">✦ Atual</span></div>
-            <div style="font-size:13px;color:var(--ts);margin-bottom:12px">R$ 29,90/mês</div>
-            <div style="font-size:12px;color:var(--ts);display:flex;flex-direction:column;gap:6px">
-              <span>✓ Pix ilimitado</span>
-              <span>✓ Cashback 1,5%</span>
-              <span>✓ Investimentos</span>
-              <span>✗ Seguro viagem</span>
+            <div
+              style="padding:16px;background:var(--lilas-dim);border-radius:var(--r-lg);border:1px solid rgba(139,92,246,0.3)">
+              <div style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:4px">Pro <span
+                  style="color:var(--lilas)">✦ Atual</span></div>
+              <div style="font-size:13px;color:var(--ts);margin-bottom:12px">R$ 29,90/mês</div>
+              <div style="font-size:12px;color:var(--ts);display:flex;flex-direction:column;gap:6px">
+                <span>✓ Pix ilimitado</span>
+                <span>✓ Cashback 1,5%</span>
+                <span>✓ Investimentos</span>
+                <span>✗ Seguro viagem</span>
+              </div>
             </div>
-          </div>
-          <div style="padding:16px;background:var(--ambar-dim);border-radius:var(--r-lg);border:1px solid rgba(251,191,36,0.25)">
-            <div style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:4px">Ultra ★</div>
-            <div style="font-size:13px;color:var(--ts);margin-bottom:12px">R$ 59,90/mês</div>
-            <div style="font-size:12px;color:var(--ts);display:flex;flex-direction:column;gap:6px">
-              <span>✓ Cashback 3%</span>
-              <span>✓ Seguro viagem</span>
-              <span>✓ Sala VIP aeroporto</span>
-              <span>✓ Câmbio sem taxa</span>
+            <div
+              style="padding:16px;background:var(--ambar-dim);border-radius:var(--r-lg);border:1px solid rgba(251,191,36,0.25)">
+              <div style="font-family:var(--font-display);font-size:15px;font-weight:700;margin-bottom:4px">Ultra ★
+              </div>
+              <div style="font-size:13px;color:var(--ts);margin-bottom:12px">R$ 59,90/mês</div>
+              <div style="font-size:12px;color:var(--ts);display:flex;flex-direction:column;gap:6px">
+                <span>✓ Cashback 3%</span>
+                <span>✓ Seguro viagem</span>
+                <span>✓ Sala VIP aeroporto</span>
+                <span>✓ Câmbio sem taxa</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- TAB: ATIVIDADE -->
-    <div class="tab-painel" id="tab-atividade">
-      <div class="card animar">
-        <div class="card-titulo">Registro de atividade</div>
-        <div class="card-sub">Histórico de acessos e ações na conta</div>
-        <div class="atividade-lista">
-          <div class="atividade-item">
-            <div class="ativ-icone" style="background:var(--verde-dim)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--verde)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <!-- TAB: ATIVIDADE -->
+      <div class="tab-painel" id="tab-atividade">
+        <div class="card animar">
+          <div class="card-titulo">Registro de atividade</div>
+          <div class="card-sub">Histórico de acessos e ações na conta</div>
+          <div class="atividade-lista">
+            <div class="atividade-item">
+              <div class="ativ-icone" style="background:var(--verde-dim)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--verde)" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              </div>
+              <div class="ativ-info">
+                <div class="ativ-titulo">Login realizado</div>
+                <div class="ativ-data">Chrome · macOS · 09 abr. 2026 às 09:14</div>
+              </div>
+              <span class="ativ-status" style="background:var(--verde-dim);color:var(--verde)">Autorizado</span>
             </div>
-            <div class="ativ-info">
-              <div class="ativ-titulo">Login realizado</div>
-              <div class="ativ-data">Chrome · macOS · 09 abr. 2026 às 09:14</div>
+            <div class="separador"></div>
+            <div class="atividade-item">
+              <div class="ativ-icone" style="background:var(--lilas-dim)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--lilas)" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </div>
+              <div class="ativ-info">
+                <div class="ativ-titulo">Dados pessoais alterados</div>
+                <div class="ativ-data">Telefone atualizado · 07 abr. 2026 às 16:42</div>
+              </div>
+              <span class="ativ-status" style="background:var(--lilas-dim);color:#c4b5fd">Alteração</span>
             </div>
-            <span class="ativ-status" style="background:var(--verde-dim);color:var(--verde)">Autorizado</span>
-          </div>
-          <div class="separador"></div>
-          <div class="atividade-item">
-            <div class="ativ-icone" style="background:var(--lilas-dim)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--lilas)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <div class="separador"></div>
+            <div class="atividade-item">
+              <div class="ativ-icone" style="background:var(--ambar-dim)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2">
+                  <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4" />
+                </svg>
+              </div>
+              <div class="ativ-info">
+                <div class="ativ-titulo">Pix enviado — R$ 350,00</div>
+                <div class="ativ-data">Para Maria Fernanda · 05 abr. 2026 às 10:20</div>
+              </div>
+              <span class="ativ-status" style="background:var(--ambar-dim);color:var(--ambar)">Transação</span>
             </div>
-            <div class="ativ-info">
-              <div class="ativ-titulo">Dados pessoais alterados</div>
-              <div class="ativ-data">Telefone atualizado · 07 abr. 2026 às 16:42</div>
+            <div class="separador"></div>
+            <div class="atividade-item">
+              <div class="ativ-icone" style="background:var(--rosa-dim)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--rosa)" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                </svg>
+              </div>
+              <div class="ativ-info">
+                <div class="ativ-titulo">Tentativa de acesso bloqueada</div>
+                <div class="ativ-data">IP suspeito · 02 abr. 2026 às 03:17</div>
+              </div>
+              <span class="ativ-status" style="background:var(--rosa-dim);color:var(--rosa)">Bloqueado</span>
             </div>
-            <span class="ativ-status" style="background:var(--lilas-dim);color:#c4b5fd">Alteração</span>
-          </div>
-          <div class="separador"></div>
-          <div class="atividade-item">
-            <div class="ativ-icone" style="background:var(--ambar-dim)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--ambar)" stroke-width="2"><path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
+            <div class="separador"></div>
+            <div class="atividade-item">
+              <div class="ativ-icone" style="background:var(--verde-dim)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--verde)" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              </div>
+              <div class="ativ-info">
+                <div class="ativ-titulo">Login realizado — iPhone</div>
+                <div class="ativ-data">Safari · iOS · 01 abr. 2026 às 08:05</div>
+              </div>
+              <span class="ativ-status" style="background:var(--verde-dim);color:var(--verde)">Autorizado</span>
             </div>
-            <div class="ativ-info">
-              <div class="ativ-titulo">Pix enviado — R$ 350,00</div>
-              <div class="ativ-data">Para Maria Fernanda · 05 abr. 2026 às 10:20</div>
-            </div>
-            <span class="ativ-status" style="background:var(--ambar-dim);color:var(--ambar)">Transação</span>
-          </div>
-          <div class="separador"></div>
-          <div class="atividade-item">
-            <div class="ativ-icone" style="background:var(--rosa-dim)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--rosa)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
-            </div>
-            <div class="ativ-info">
-              <div class="ativ-titulo">Tentativa de acesso bloqueada</div>
-              <div class="ativ-data">IP suspeito · 02 abr. 2026 às 03:17</div>
-            </div>
-            <span class="ativ-status" style="background:var(--rosa-dim);color:var(--rosa)">Bloqueado</span>
-          </div>
-          <div class="separador"></div>
-          <div class="atividade-item">
-            <div class="ativ-icone" style="background:var(--verde-dim)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--verde)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <div class="ativ-info">
-              <div class="ativ-titulo">Login realizado — iPhone</div>
-              <div class="ativ-data">Safari · iOS · 01 abr. 2026 às 08:05</div>
-            </div>
-            <span class="ativ-status" style="background:var(--verde-dim);color:var(--verde)">Autorizado</span>
           </div>
         </div>
       </div>
-    </div>
 
-  </main>
+    </main>
 
-  <!-- LATERAL DIREITA -->
-  <aside class="lateral">
-    <div class="lateral-titulo">Score de crédito</div>
+    <!-- LATERAL DIREITA -->
+    <aside class="lateral">
+      <div class="lateral-titulo">Score de crédito</div>
 
-    <div class="score-anel">
-      <canvas id="canvas-score" width="140" height="140"></canvas>
-      <div class="score-numero">
-        <strong>812</strong>
-        <span>Excelente</span>
-      </div>
-    </div>
-
-    <div>
-      <p style="font-size:12px;color:var(--ts);margin-bottom:10px">Verificações da conta</p>
-      <div class="verificacoes">
-        <div class="verif-item">
-          <div class="verif-icone verif-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="verif-info"><small>Identidade</small><span>Verificado</span></div>
-        </div>
-        <div class="verif-item">
-          <div class="verif-icone verif-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="verif-info"><small>E-mail</small><span>Verificado</span></div>
-        </div>
-        <div class="verif-item">
-          <div class="verif-icone verif-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div class="verif-info"><small>Telefone</small><span>Verificado</span></div>
-        </div>
-        <div class="verif-item">
-          <div class="verif-icone verif-pend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-          <div class="verif-info"><small>Comprovante de renda</small><span style="color:var(--ambar)">Pendente</span></div>
+      <div class="score-anel">
+        <canvas id="canvas-score" width="140" height="140"></canvas>
+        <div class="score-numero">
+          <strong>812</strong>
+          <span>Excelente</span>
         </div>
       </div>
-    </div>
 
-    <div class="card" style="padding:16px">
-      <div style="font-size:12px;color:var(--ts);margin-bottom:8px">Detalhes da conta</div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--ts)">Agência</span><span>0001</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--ts)">Conta</span><span>12847-5</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--ts)">Banco</span><span>748 — Almeria</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--ts)">Tipo</span><span>Corrente PF</span></div>
+      <div>
+        <p style="font-size:12px;color:var(--ts);margin-bottom:10px">Verificações da conta</p>
+        <div class="verificacoes">
+          <div class="verif-item">
+            <div class="verif-icone verif-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12" />
+              </svg></div>
+            <div class="verif-info"><small>Identidade</small><span>Verificado</span></div>
+          </div>
+          <div class="verif-item">
+            <div class="verif-icone verif-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12" />
+              </svg></div>
+            <div class="verif-info"><small>E-mail</small><span>Verificado</span></div>
+          </div>
+          <div class="verif-item">
+            <div class="verif-icone verif-ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12" />
+              </svg></div>
+            <div class="verif-info"><small>Telefone</small><span>Verificado</span></div>
+          </div>
+          <div class="verif-item">
+            <div class="verif-icone verif-pend"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg></div>
+            <div class="verif-info"><small>Comprovante de renda</small><span style="color:var(--ambar)">Pendente</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <button class="btn-sair" onclick="window.location='login.html'">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Sair da conta
-    </button>
-  </aside>
+      <div class="card" style="padding:16px">
+        <div style="font-size:12px;color:var(--ts);margin-bottom:8px">Detalhes da conta</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span
+              style="color:var(--ts)">Agência</span><span>0001</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span
+              style="color:var(--ts)">Conta</span><span>12847-5</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span
+              style="color:var(--ts)">Banco</span><span>748 — Almeria</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px"><span
+              style="color:var(--ts)">Tipo</span><span>Corrente PF</span></div>
+        </div>
+      </div>
 
-</div>
+      <button class="btn-sair" onclick="window.location='login.html'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+        Sair da conta
+      </button>
+    </aside>
 
-<!-- TOAST -->
-<div class="toast" id="toast">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-  <span id="toast-msg">Alterações salvas com sucesso!</span>
-</div>
+  </div>
 
-<script>
-function mudarTab(id, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('ativo'));
-  document.querySelectorAll('.tab-painel').forEach(p => p.classList.remove('ativo'));
-  btn.classList.add('ativo');
-  document.getElementById('tab-' + id).classList.add('ativo');
-}
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+    <span id="toast-msg">Alterações salvas com sucesso!</span>
+  </div>
 
-function salvar(msg) {
-  const toast = document.getElementById('toast');
-  document.getElementById('toast-msg').textContent = msg || 'Alterações salvas com sucesso!';
-  toast.classList.add('visivel');
-  setTimeout(() => toast.classList.remove('visivel'), 3000);
-}
+  <script>
+    function mudarTab(id, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('ativo'));
+      document.querySelectorAll('.tab-painel').forEach(p => p.classList.remove('ativo'));
+      btn.classList.add('ativo');
+      document.getElementById('tab-' + id).classList.add('ativo');
+    }
 
-// Score de crédito — canvas radial
-window.addEventListener('load', () => {
-  const canvas = document.getElementById('canvas-score');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  const cx = 70, cy = 70, r = 54;
-  const score = 812, max = 1000;
-  const pct = score / max;
-  const startAngle = Math.PI * 0.75;
-  const totalArc = Math.PI * 1.5;
+    function salvar(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').textContent = msg || 'Alterações salvas com sucesso!';
+      toast.classList.add('visivel');
+      setTimeout(() => toast.classList.remove('visivel'), 3000);
+    }
 
-  // Trilho
-  ctx.beginPath();
-  ctx.arc(cx, cy, r, startAngle, startAngle + totalArc);
-  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-  ctx.lineWidth = 10;
-  ctx.lineCap = 'round';
-  ctx.stroke();
+    // Score de crédito — canvas radial
+    window.addEventListener('load', () => {
+      const canvas = document.getElementById('canvas-score');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const cx = 70, cy = 70, r = 54;
+      const score = 812, max = 1000;
+      const pct = score / max;
+      const startAngle = Math.PI * 0.75;
+      const totalArc = Math.PI * 1.5;
 
-  // Gradiente
-  const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  grad.addColorStop(0, '#8b5cf6');
-  grad.addColorStop(1, '#00f5a8');
+      // Trilho
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, startAngle, startAngle + totalArc);
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.lineWidth = 10;
+      ctx.lineCap = 'round';
+      ctx.stroke();
 
-  // Progresso animado
-  let current = 0;
-  const target = pct * totalArc;
-  const animate = () => {
-    current = Math.min(current + target / 60, target);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Gradiente
+      const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      grad.addColorStop(0, '#8b5cf6');
+      grad.addColorStop(1, '#00f5a8');
 
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, startAngle, startAngle + totalArc);
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
-    ctx.lineWidth = 10;
-    ctx.lineCap = 'round';
-    ctx.stroke();
+      // Progresso animado
+      let current = 0;
+      const target = pct * totalArc;
+      const animate = () => {
+        current = Math.min(current + target / 60, target);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, startAngle, startAngle + current);
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = 10;
-    ctx.lineCap = 'round';
-    ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, startAngle, startAngle + totalArc);
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+        ctx.lineWidth = 10;
+        ctx.lineCap = 'round';
+        ctx.stroke();
 
-    if (current < target) requestAnimationFrame(animate);
-  };
-  animate();
-});
-</script>
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, startAngle, startAngle + current);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 10;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        if (current < target) requestAnimationFrame(animate);
+      };
+      animate();
+    });
+  </script>
 
 </body>
+
 </html>

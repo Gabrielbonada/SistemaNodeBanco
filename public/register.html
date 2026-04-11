@@ -1,49 +1,221 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Cadastro - Almeria</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Almeria NeoBank — Criar Conta</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/register.css">
 </head>
 <body>
 
-  <h2>Criar Conta</h2>
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
 
-<input type="text" id="nome" placeholder="Nome"><br><br> <input type="email" id="email" placeholder="Email"><br><br> <input type="password" id="senha" placeholder="Senha"><br><br>
+<div class="pagina">
 
-<button onclick="cadastrar()">Cadastrar</button>
+  <header class="cabecalho">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div class="logo-texto">
+        <strong>Almeria</strong>
+        <small>NeoBank</small>
+      </div>
+    </div>
 
-  <p>Já tem conta? <a href="login.html">Login</a></p>
+    <div class="cabecalho-links">
+      <a href="#">Sobre nós</a>
+      <a href="#">Planos</a>
+      <a href="#">Suporte</a>
+      <a href="login.html" class="btn-entrar-cab">Já tenho conta</a>
+    </div>
+  </header>
 
-  <script>
-    async function cadastrar() {
-      const nome = document.getElementById("nome").value;
-      const email = document.getElementById("email").value;
-      const senha = document.getElementById("senha").value;
+  <div class="formulario-wrap">
+    <div class="form-card fade-up fade-up-1">
+      <div class="form-header">
+        <h1>Crie sua conta</h1>
+        <p>Gratuita, sem burocracia e em menos de 2 minutos</p>
+      </div>
 
-      if (!nome || !email || !senha) {
-        alert("Preencha todos os campos!");
-        return;
-      }
 
-      const res = await fetch("http://localhost:3000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ nome, email, senha })
-      });
+      <div id="alerta-erro" class="alerta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span id="alerta-texto">Preencha todos os campos corretamente.</span>
+      </div>
 
-      const data = await res.json();
+      <div id="alerta-sucesso" class="alerta-sucesso">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <span>Conta criada com sucesso! Redirecionando...</span>
+      </div>
 
-      if (res.ok) {
-        alert("Conta criada com sucesso!");
-        window.location.href = "login.html";
-      } else {
-        alert(data.msg || "Erro ao cadastrar");
-      }
+      <div class="campos fade-up fade-up-3">
+        <div class="campo">
+          <label for="nome">Nome completo</label>
+          <div class="campo-input">
+            <input type="text" id="nome" placeholder="Seu nome completo" autocomplete="name">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="email">E-mail</label>
+          <div class="campo-input">
+            <input type="email" id="email" placeholder="seu@email.com" autocomplete="email">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="senha">Senha</label>
+          <div class="campo-input com-icone-dir">
+            <input type="password" id="senha" placeholder="Mínimo 8 caracteres" autocomplete="new-password" oninput="avaliarForca(this.value)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <svg class="icon-dir" id="toggle-senha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" onclick="toggleSenha()">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </div>
+          <div class="forca-wrap" id="forca-wrap" style="display:none">
+            <div class="forca-barras">
+              <div class="forca-barra" id="b1"></div>
+              <div class="forca-barra" id="b2"></div>
+              <div class="forca-barra" id="b3"></div>
+              <div class="forca-barra" id="b4"></div>
+            </div>
+            <span class="forca-label" id="forca-label">Muito fraca</span>
+          </div>
+        </div>
+      </div>
+
+      <label class="termo-check fade-up fade-up-3">
+        <input type="checkbox" id="termos">
+        Concordo com os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a> da Almeria
+      </label>
+
+      <button class="btn-cadastrar fade-up fade-up-3" id="btn-cadastrar" onclick="cadastrar()">
+        <span class="texto-btn">Criar minha conta</span>
+        <span class="spinner"></span>
+      </button>
+
+      <div class="badge-seguranca fade-up fade-up-3">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Conexão protegida por criptografia TLS 256-bit
+      </div>
+
+      <p class="form-rodape fade-up fade-up-3">
+        Já tem uma conta? <a href="login.html">Entrar agora</a>
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleSenha() {
+  const input = document.getElementById('senha');
+  const icon = document.getElementById('toggle-senha');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    input.type = 'password';
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+
+function avaliarForca(senha) {
+  const wrap = document.getElementById('forca-wrap');
+  const label = document.getElementById('forca-label');
+  const barras = [document.getElementById('b1'), document.getElementById('b2'), document.getElementById('b3'), document.getElementById('b4')];
+
+  if (!senha) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+
+  let score = 0;
+  if (senha.length >= 8) score++;
+  if (/[A-Z]/.test(senha)) score++;
+  if (/[0-9]/.test(senha)) score++;
+  if (/[^A-Za-z0-9]/.test(senha)) score++;
+
+  const labels = ['Muito fraca', 'Fraca', 'Média', 'Forte'];
+  const classes = ['ativa-fraca', 'ativa-fraca', 'ativa-media', 'ativa-forte'];
+
+  barras.forEach((b, i) => {
+    b.className = 'forca-barra';
+    if (i < score) b.classList.add(classes[score - 1]);
+  });
+
+  label.textContent = labels[score - 1] || 'Muito fraca';
+  label.style.color = score <= 1 ? 'var(--rosa)' : score === 2 ? 'var(--ambar)' : 'var(--verde)';
+}
+
+function mostrarErro(msg) {
+  const alerta = document.getElementById('alerta-erro');
+  document.getElementById('alerta-texto').textContent = msg;
+  alerta.classList.add('visivel');
+  setTimeout(() => alerta.classList.remove('visivel'), 4000);
+}
+
+async function cadastrar() {
+  const nome = document.getElementById('nome').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const senha = document.getElementById('senha').value;
+  const termos = document.getElementById('termos').checked;
+  const btn = document.getElementById('btn-cadastrar');
+
+  if (!nome) { mostrarErro('Informe seu nome completo.'); return; }
+  if (!email) { mostrarErro('Informe seu e-mail.'); return; }
+  if (!senha || senha.length < 8) { mostrarErro('A senha deve ter pelo menos 8 caracteres.'); return; }
+  if (!termos) { mostrarErro('Aceite os Termos de Uso para continuar.'); return; }
+
+  btn.classList.add('carregando');
+
+  try {
+    const res = await fetch('http://localhost:3000/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, email, senha })
+    });
+
+    const data = await res.json();
+    btn.classList.remove('carregando');
+
+    if (res.ok) {
+      document.getElementById('alerta-sucesso').classList.add('visivel');
+      setTimeout(() => window.location.href = 'login.html', 2000);
+    } else {
+      mostrarErro(data.msg || 'Erro ao criar conta. Tente novamente.');
     }
-  </script>
+  } catch (err) {
+    btn.classList.remove('carregando');
+    mostrarErro('Não foi possível conectar ao servidor.');
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') cadastrar();
+});
+</script>
 
 </body>
 </html>
