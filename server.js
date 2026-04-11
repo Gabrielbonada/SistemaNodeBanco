@@ -23,6 +23,9 @@ app.get("/", (req, res) => {
 
 // rotas da API
 app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/conta",     require("./routes/contaRoutes"));      
+app.use("/api/transacao", require("./routes/transacaoRoutes"));  
+app.use("/api/cartao",    require("./routes/cartaoRoutes"));
 
 // subir servidor
 app.listen(3000, () => {
