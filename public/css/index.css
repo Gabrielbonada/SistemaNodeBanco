@@ -393,7 +393,6 @@ button, select, input { font: inherit; }
 .card-metrica {
   background: var(--c700);
   border: 1px solid var(--borda);
-  border-radius: var(--r-xl);
   padding: 18px;
   position: relative;
   overflow: hidden;
@@ -437,7 +436,7 @@ button, select, input { font: inherit; }
 }
 
 .metrica-valor {
-  font-family: var(--font-display);
+ 
   font-size: 20px;
   font-weight: 700;
   color: var(--tp);
@@ -920,7 +919,6 @@ button, select, input { font: inherit; }
 .cartao-mini-dados p { font-size: 11px; color: var(--ts); margin-top: 2px; }
 
 .cartao-mini-saldo {
-  font-family: var(--font-display);
   font-size: 13px;
   font-weight: 700;
   color: var(--verde);
